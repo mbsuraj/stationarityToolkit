@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stationarityToolkit"
+version = "0.0.0"
+authors = [
+  { name="Bhanu Suraj Malla", email="bsmalla@asu.edu" },
+]
+description = "Test and Convert non-stationary time-series to stationary"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Custom Learning-Only License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/mbsuraj/staionarity-toolkit"
+"Bug Tracker" = "https://github.com/mbsuraj/staionarity-toolkit/issues"
