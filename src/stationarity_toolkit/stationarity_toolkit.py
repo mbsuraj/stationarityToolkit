@@ -170,6 +170,7 @@ class StationarityToolkit:
                 },
                 index=ts.index,
             )
+            plt.figure(figsize=(10, 6))
             self.df.plot(
                 title="Variance Stationarity with Best Transformation", figsize=(10, 6)
             )
@@ -385,10 +386,7 @@ class StationarityToolkit:
                 df.drop(columns=["original"], inplace=True)
                 self.df = pd.merge(self.df, df, left_index=True, right_index=True)
             else:
-                df.plot(title="Trend Stationarity", figsize=(10, 6))
-                plt.xlabel("Time")
-                plt.ylabel("weekly_units_sold")
-                plt.show()
+                pass
             # Generate and save the inverse function
             inv_function_serialized = None
             if self._differencing == "trend":
@@ -423,6 +421,15 @@ class StationarityToolkit:
 
     # # Serialize the inverse function using pickle
     # inv_function_serialized = pickle.dumps(lambda ts_diff: inverse_seasonal_difference(ts_diff, initial_value_example))
+    def _plot_trend_stationary_series(self):
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.df.index, self.df.original, label="Original")
+        plt.plot(self.df.index, self.df.trend_transformed, label="Trend-Transformed")
+        plt.plot(title="Trend Stationarity", figsize=(10, 6))
+        plt.legend()
+        plt.xlabel("Time")
+        plt.ylabel("Values")
+        plt.show()
 
     def remove_nonstationarity(self, ts):
         """
@@ -437,4 +444,5 @@ class StationarityToolkit:
         self._index = self._get_index()
         df = self.remove_var_nonstationarity(ts)
         df2 = self.remove_trend_nonstationarity(df[["var_transformed"]])
+        self._plot_trend_stationary_series()
         return df2
