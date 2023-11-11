@@ -125,11 +125,13 @@ class StationarityToolkit:
             constant = (
                 1  # Choose a positive constant (can be adjusted based on the data)
             )
-            boxcox_transformed_data, lam = boxcox(ts.values.flatten() + constant)
-            transformations["Box-Cox Transformed"] = (
-                boxcox_transformed_data,
-                self.inv_boxcox,
-            )
+            bc_ts = ts.values.flatten() + constant
+            if np.all(bc_ts > 0):
+                boxcox_transformed_data, lam = boxcox(bc_ts)
+                transformations["Box-Cox Transformed"] = (
+                    boxcox_transformed_data,
+                    self.inv_boxcox,
+                )
 
             # Test variance stationarity for each transformed series
             best_transformation = None
@@ -171,9 +173,14 @@ class StationarityToolkit:
                 index=ts.index,
             )
             plt.figure(figsize=(10, 6))
-            self.df.plot(
-                title="Variance Stationarity with Best Transformation", figsize=(10, 6)
-            )
+            plt.plot(self.df.index, self.df.original, label="Original Plot")
+            plt.plot(self.df.index, self.df.var_transformed,
+                     label=f"{best_transformation_name} Variance Stationary Plot")
+            plt.title("Variance Stationarity Plot")
+            # self.df.plot(
+            #     title="Variance Stationarity with Best Transformation", figsize=(10, 6)
+            # )
+            plt.legend()
             plt.xlabel("Time")
             plt.ylabel("Values")
             plt.show()
@@ -188,7 +195,6 @@ class StationarityToolkit:
                 },
                 index=ts.index,
             )
-
         self._var_nonstationarity_removed = True
         return self.df
 
@@ -424,7 +430,7 @@ class StationarityToolkit:
     def _plot_trend_stationary_series(self):
         plt.figure(figsize=(10, 6))
         plt.plot(self.df.index, self.df.original, label="Original")
-        plt.plot(self.df.index, self.df.trend_transformed, label="Trend-Transformed")
+        plt.plot(self.df.index, self.df.trend_transformed, label=f"{self._differencing}-Transformed")
         plt.plot(title="Trend Stationarity", figsize=(10, 6))
         plt.legend()
         plt.xlabel("Time")

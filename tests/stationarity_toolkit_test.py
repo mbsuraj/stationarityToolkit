@@ -29,8 +29,6 @@ def return_trend_variance_non_stationary_series():
 
     return df
 
-import numpy as np
-import pandas as pd
 
 def return_trend_seasonal_and_variance_nstationary_series():
     # Set a random seed for reproducibility
@@ -49,11 +47,11 @@ def return_trend_seasonal_and_variance_nstationary_series():
 
     # Generate noise with increasing variance
     noise_variance = np.linspace(0.1, 2.0, n)  # Increasing variance
-    noise = np.random.normal(0, noise_variance, n)
+    noise = np.abs(np.random.normal(0, noise_variance, n))  # Positive noise
 
     # Generate a seasonal pattern with increased amplitude
     seasonal_amplitude = 10  # Increased amplitude for more prominent seasonality
-    seasonal_pattern = seasonal_amplitude * np.sin(2 * np.pi * np.arange(n) / num_seasons)  # Seasonal pattern
+    seasonal_pattern = seasonal_amplitude * np.abs(np.sin(2 * np.pi * np.arange(n) / num_seasons + np.pi / 2))  # Shift phase to make it strictly positive
 
     # Combine the trend, seasonal pattern, and noise to create the time series
     time_series = trend + seasonal_pattern + noise
@@ -62,3 +60,8 @@ def return_trend_seasonal_and_variance_nstationary_series():
     df = pd.DataFrame({'Value': time_series}, index=time_index)
 
     return df
+
+def sample_real_dataset_test(csv_filepath: str):
+    real_dataset = pd.read_csv(csv_filepath, index_col=0)
+    real_dataset = real_dataset.fillna(0)
+    return real_dataset
