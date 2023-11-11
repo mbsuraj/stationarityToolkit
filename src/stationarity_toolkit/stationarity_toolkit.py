@@ -125,11 +125,13 @@ class StationarityToolkit:
             constant = (
                 1  # Choose a positive constant (can be adjusted based on the data)
             )
-            boxcox_transformed_data, lam = boxcox(ts.values.flatten() + constant)
-            transformations["Box-Cox Transformed"] = (
-                boxcox_transformed_data,
-                self.inv_boxcox,
-            )
+            bc_ts = ts.values.flatten() + constant
+            if np.all(bc_ts > 0):
+                boxcox_transformed_data, lam = boxcox(bc_ts)
+                transformations["Box-Cox Transformed"] = (
+                    boxcox_transformed_data,
+                    self.inv_boxcox,
+                )
 
             # Test variance stationarity for each transformed series
             best_transformation = None
@@ -170,9 +172,15 @@ class StationarityToolkit:
                 },
                 index=ts.index,
             )
-            self.df.plot(
-                title="Variance Stationarity with Best Transformation", figsize=(10, 6)
-            )
+            plt.figure(figsize=(10, 6))
+            plt.plot(self.df.index, self.df.original, label="Original Plot")
+            plt.plot(self.df.index, self.df.var_transformed,
+                     label=f"{best_transformation_name} Variance Stationary Plot")
+            plt.title("Variance Stationarity Plot")
+            # self.df.plot(
+            #     title="Variance Stationarity with Best Transformation", figsize=(10, 6)
+            # )
+            plt.legend()
             plt.xlabel("Time")
             plt.ylabel("Values")
             plt.show()
@@ -187,7 +195,6 @@ class StationarityToolkit:
                 },
                 index=ts.index,
             )
-
         self._var_nonstationarity_removed = True
         return self.df
 
@@ -385,10 +392,7 @@ class StationarityToolkit:
                 df.drop(columns=["original"], inplace=True)
                 self.df = pd.merge(self.df, df, left_index=True, right_index=True)
             else:
-                df.plot(title="Trend Stationarity", figsize=(10, 6))
-                plt.xlabel("Time")
-                plt.ylabel("weekly_units_sold")
-                plt.show()
+                pass
             # Generate and save the inverse function
             inv_function_serialized = None
             if self._differencing == "trend":
@@ -423,6 +427,15 @@ class StationarityToolkit:
 
     # # Serialize the inverse function using pickle
     # inv_function_serialized = pickle.dumps(lambda ts_diff: inverse_seasonal_difference(ts_diff, initial_value_example))
+    def _plot_trend_stationary_series(self):
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.df.index, self.df.original, label="Original")
+        plt.plot(self.df.index, self.df.trend_transformed, label=f"{self._differencing}-Transformed")
+        plt.plot(title="Trend Stationarity", figsize=(10, 6))
+        plt.legend()
+        plt.xlabel("Time")
+        plt.ylabel("Values")
+        plt.show()
 
     def remove_nonstationarity(self, ts):
         """
@@ -437,4 +450,5 @@ class StationarityToolkit:
         self._index = self._get_index()
         df = self.remove_var_nonstationarity(ts)
         df2 = self.remove_trend_nonstationarity(df[["var_transformed"]])
+        self._plot_trend_stationary_series()
         return df2
