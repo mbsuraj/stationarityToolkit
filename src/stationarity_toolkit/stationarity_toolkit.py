@@ -325,8 +325,13 @@ class StationarityToolkit:
             self.logger.info("REMOVE TREND NON-STATIONARITY")
             self.logger.info("-----------------------LOG-------------------------")
             self.logger.info("INITIAL STATISTICAL TESTS")
-        dfoutput = self.adf_test(ts.dropna())
-        kpss_output = self.kpss_test(ts.dropna())
+        # Perform ADF and KPSS tests
+        try:
+            dfoutput = self.adf_test(ts.dropna())
+            kpss_output = self.kpss_test(ts.dropna())
+        except ValueError as e:
+            self.logger.error(f"Error occurred during ADF or KPSS test: {e}")
+            return None
         self._recurse_cnt += 1
         self.logger.info("----------------------------------------------------")
         self.logger.info(f"Recurse Count: {self._recurse_cnt}")
@@ -349,7 +354,11 @@ class StationarityToolkit:
                 ts_seasonal_diff = ts - ts.shift(52)
                 if self.remove_trend_nonstationarity(ts_seasonal_diff) is None:
                     self._differencing = "seasonal_trend"
-                    self._trend_initial_value = ts_seasonal_diff.iloc[52]
+                    if len(ts_seasonal_diff) > 52:
+                        self._trend_initial_value = ts_seasonal_diff.iloc[52]
+                    else:
+                        self.logger.error("ts_seasonal_diff doesn't have enough elements.")
+                        return None
                     self.logger.info(
                         "Seasonality Removal didn't work. Removing Trend on top of Seasonal Differencing"
                     )
@@ -357,11 +366,16 @@ class StationarityToolkit:
                         1
                     )
                     ts_seasonal_trend_diff.index = self._index
-                    return self.remove_trend_nonstationarity(ts_seasonal_trend_diff)
+                    result = self.remove_trend_nonstationarity(ts_seasonal_trend_diff)
+                    self._recurse_cnt = 0
+                    return result
                 else:
                     self.remove_trend_nonstationarity(ts_seasonal_diff)
+                    self._recurse_cnt = 0
             else:
-                return self.remove_trend_nonstationarity(ts_dif)
+                result = self.remove_trend_nonstationarity(ts_dif)
+                self._recurse_cnt = 0
+                return result
             ts_dif.index = self._index
         elif (
             (dfoutput["p-value"] >= self.alpha)
