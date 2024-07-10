@@ -314,7 +314,7 @@ class StationarityToolkit:
 
         if self._recurse_cnt == 0:
             self.timeseries = ts if ts is not None else self.timeseries
-            self._trend_initial_value = self.timeseries.iloc[0, 0].copy()
+            self._trend_initial_value = self.timeseries.iloc[0].copy()
             self._index = self._get_index()
 
         if self._recurse_cnt == 0:
@@ -340,16 +340,16 @@ class StationarityToolkit:
                 "Both tests conclude that the series is not stationary -> Removing trend**"
             )
             self._differencing = "trend"
-            self._trend_initial_value = ts.iloc[0, 0].copy()
+            self._trend_initial_value = ts.iloc[0].copy()
             ts_dif = ts - ts.shift(1)
             if self.remove_trend_nonstationarity(ts_dif) is None:
                 self.logger.info("Trend Removal didn't work. Removing Seasonality")
                 self._differencing = "seasonality"
-                self._seasonality_initial_value = ts.iloc[0:52, 0].copy()
+                self._seasonality_initial_value = ts.iloc[0:52].copy()
                 ts_seasonal_diff = ts - ts.shift(52)
                 if self.remove_trend_nonstationarity(ts_seasonal_diff) is None:
                     self._differencing = "seasonal_trend"
-                    self._trend_initial_value = ts_seasonal_diff.iloc[52, 0]
+                    self._trend_initial_value = ts_seasonal_diff.iloc[52]
                     self.logger.info(
                         "Seasonality Removal didn't work. Removing Trend on top of Seasonal Differencing"
                     )
