@@ -1,74 +1,88 @@
-# StationarityToolkit
+# 📊 StationarityToolkit
 
-The StationarityToolkit is a Python library designed to help you analyze and prepare time series data for stationarity. It offers a set of powerful tools for dealing with both trend and variance non-stationarity in your time series data. Below, we'll describe its key features and how to use them:
+**StationarityToolkit** is a Python library designed to help you **analyze and transform time series data for stationarity**. It offers a suite of statistical tests and automated transformations to detect and handle both **trend** and **variance** non-stationarity.
 
-## Features:
+Whether you're building a forecasting model or preparing data for analysis, this toolkit makes your preprocessing easier and more reliable.
 
-### 1. Test for Variance Non-Stationarity
-   - Use the Phillips-Perron test to assess variance non-stationarity in your time series data.
+## 🚀 Features
 
-### 2. Test for Trend Non-Stationarity
-   - Employ the Augmented Dickey-Fuller (ADF) and Kwiatkowski-Phillips-Schmidt-Shin (KPSS) tests to identify trend non-stationarity.
 
-### 3. Remove Trend Non-Stationarity
-   - Choose from various methods to eliminate trend non-stationarity, including trend differencing, seasonal differencing, or a combination of both.
+### ✅ 1. Test for Variance Non-Stationarity
+- Use the **Phillips-Perron test** to detect variance instability.
 
-### 4. Remove Variance Non-Stationarity
-   - Apply data transformations such as logarithm, square, or Box-Cox to address variance non-stationarity.
+### ✅ 2. Test for Trend Non-Stationarity
+- Use both **ADF (Augmented Dickey-Fuller)** and **KPSS (Kwiatkowski-Phillips-Schmidt-Shin)** tests to check for trend-based non-stationarity.
 
-### 5. Remove Both Trend and Variance Non-Stationarity
-   - Combine the trend and variance non-stationarity removal techniques to make your time series data stationary.
+### 🔧 3. Remove Trend Non-Stationarity
+- Automatically apply:
+  - **Trend differencing**
+  - **Seasonal differencing**
+  - Or a combination of both
+- Optimized for **weekly seasonal data**.
 
-## How to Use:
+### 🔧 4. Remove Variance Non-Stationarity
+- Automatically apply transformations like:
+  - **Logarithmic**
+  - **Square root**
+  - **Box-Cox**
+- Selects the best transformation based on statistical significance.
+- Skips transformation if variance is already stationary.
 
- 
-1. **Install Stationarity Toolkit:**
-   ```cmd
-   pip install StationarityToolkit
-2. **Import the StationarityToolkit:**
-   - Import the StationarityToolkit library in your Python script or Jupyter Notebook.
+### 🧹 5. Remove All Non-Stationarity
+- Combine both variance and trend removal in one pipeline:
+  - Detect and remove variance issues first
+  - Then proceed to handle trend non-stationarity
 
+---
+
+## 🛠️ Installation
+    pip install StationarityToolkit
+
+## 🧪 Quick Start:
+
+1. **Import the toolkit:**
    ```python
     from stationarity_toolkit.stationarity_toolkit import StationarityToolkit
-3. **Initialize the Toolkit:**
-
-   - Begin by creating an instance of the StationarityToolkit class, passing your time series data as an argument.
-
-   ```python
-    from StationarityToolkit import StationarityToolkit
-    
-    toolkit = StationarityToolkit(alpha)
+2. **Initialize the Toolkit:**
+   ```python 
+    toolkit = StationarityToolkit(alpha=0.05)
    
-After this point you can try different things with the toolkit. Such as:
-1. **Test for Stationarity:**
-
-- Utilize the toolkit's methods to assess stationarity in your time series data. The toolkit offers the following testing options:
-
+## ⚙️ Usage Guide
+1. **✅ Test for Stationarity:**
    ```python
-   toolkit.perform_pp_test(ts)  # Phillips-Perron Test for variance non-stationarity
-   toolkit.adf_test(ts)              # Test for trend non-stationarity using ADF
-   toolkit.kpss_test(ts)             # Test for trend non-stationarity using KPSS
-2. **Remove Variance Non-Stationarity**
-- The toolkit will perform log, square root, and box-cox transformations
-while testing for Phillips-Perron Test. The transformation with least p value 
-is chosen.
-- Even before testing the transformations, the model shall test the original
-data to see if it really has any variance nonstationarity. If not, it will skip
-transformations altogether.
+    toolkit.perform_pp_test(ts)     # Phillips-Perron test for variance non-stationarity
+    toolkit.adf_test(ts)            # Augmented Dickey-Fuller test for trend
+    toolkit.kpss_test(ts)           # KPSS test for trend
+2. **🔧 Remove Variance Non-Stationarity**
    ```python
-  toolkit.remove_var_nonstationarity(ts_as_a_dataframe)
+    toolkit.remove_var_nonstationarity(ts_as_a_dataframe)
+- Checks if variance non-stationarity exists. 
+- Applies log, square root, and Box-Cox transformations. 
+- Selects the transformation that produces the lowest p-value. 
+- Skips transformation if unnecessary.
 
-3. **Remove Trend Non-Stationarity**
-- The toolkit will perform lag term differencing, seasonal differencing
-or a combination of both while iteratively doing adf_test and kpss_test 
-to determine the best transformation to achieve trend non-stationarity. 
-- NOTE: CURRENT VERSION ONLY DEALS WITH WEEKLY SEASONAL DATA.
+3. **🔧 Remove Trend Non-Stationarity**
    ```python
-  toolkit.remove_var_nonstationarity(ts_as_a_dataframe)
-4. **Remove Non-Stationarity**
-- The toolkit will test and remove both trend and variance
-non-stationarity. First it will begin with variance non-stationarity testing
-and removal and then proceed to trend non-stationarity testing 
-and removal.
+    toolkit.remove_var_nonstationarity(ts_as_a_dataframe)
+- Applies differencing techniques:
+  - Lag differencing 
+  - Seasonal differencing 
+  - Combination of both
+- Evaluates each using ADF and KPSS tests to find the best transformation. 
+- ⚠️ Currently supports weekly seasonality only.
+
+4. **🧹 Remove All Non-Stationarity**
     ```python
-  toolkit.remove_nonstationarity(ts_as_a_dataframe)
+    toolkit.remove_nonstationarity(ts_as_a_dataframe)
+- Runs both variance and trend checks/removal:
+  - Removes variance non-stationarity (if present)
+  - Then removes trend non-stationarity
+
+## 💡 Why Stationarity Matters
+- Most classical and deep learning time series models (ARIMA, VAR, Prophet, LSTM) assume that the data is stationary. Non-stationary data can lead to:
+  - Spurious regressions 
+  - Poor model accuracy 
+  - Invalid statistical inferences
+
+StationarityToolkit helps you automate this critical preprocessing step with minimal manual intervention.
+
