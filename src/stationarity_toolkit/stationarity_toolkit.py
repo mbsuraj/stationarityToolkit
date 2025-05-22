@@ -146,6 +146,8 @@ class StationarityToolkit:
 
             # Extract the best transformation information
             best_transformation_name, best_transformed_data = best_transformation
+            var_transformed = best_transformed_data if best_transformation_name == "Box-Cox Transformed" \
+                else best_transformed_data.to_numpy().flatten()
 
             self.logger.info(f"\n\nBest Transformation: {best_transformation_name}")
             self.logger.info(f"P-Value: {best_p_value}")
@@ -165,7 +167,7 @@ class StationarityToolkit:
             self.df = pd.DataFrame(
                 {
                     "original": ts.to_numpy().flatten(),
-                    "var_transformed": best_transformed_data.to_numpy().flatten(),
+                    "var_transformed": var_transformed,
                     "var_transformation_name": best_transformation_name,
                     "var_transformation_par": parameters,
                     "var_inverse_function": inv_function_serialized,
