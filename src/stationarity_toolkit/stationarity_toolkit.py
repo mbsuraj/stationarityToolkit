@@ -155,13 +155,11 @@ class StationarityToolkit:
             parameters = (
                 {}
                 if best_transformation_name != "Box-Cox Transformed"
-                else {"constant": constant, "lam": lam}
+                else str({"constant": constant, "lam": lam})
             )
 
-            # Serialize the inverse function using pickle
-            inv_function_serialized = pickle.dumps(
-                transformations[best_transformation_name][1]
-            )
+            # Serialize the inverse function
+            inv_function_serialized = transformations[best_transformation_name][1]
 
             # Plot the original and best transformed series
             self.df = pd.DataFrame(
