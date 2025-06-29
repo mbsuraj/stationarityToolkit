@@ -308,7 +308,7 @@ class StationarityToolkit:
 
         def season_trend_inv(diff_ts2, seasonal_initial_values, trend_initial_value):
             inv_diff_ts2 = diff_ts2.cumsum() + trend_initial_value
-            inv_diff_ts2.iloc[52] = trend_initial_value
+            inv_diff_ts2.iloc[-1] = trend_initial_value
             inv_inv_diff_ts2 = seasonal_inv(inv_diff_ts2, seasonal_initial_values)
             return inv_inv_diff_ts2
 
