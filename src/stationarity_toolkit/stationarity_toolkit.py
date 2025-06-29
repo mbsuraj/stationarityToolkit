@@ -74,7 +74,7 @@ class StationarityToolkit:
             self.logger.info("The time series is likely not variance stationary.")
         return p_value
 
-    def inv_boxcox(self, y_box, lambda_, constant, index):
+    def inv_boxcox(self, y_box, index, lambda_, constant):
         """
         Apply the inverse Box-Cox transformation to the given Box-Cox transformed data.
 
@@ -130,7 +130,7 @@ class StationarityToolkit:
                 boxcox_transformed_data, lam = boxcox(bc_ts)
                 transformations["Box-Cox Transformed"] = (
                     boxcox_transformed_data,
-                    lambda x: self.inv_boxcox(x, lam, constant, ts.index),
+                    lambda x, idx: self.inv_boxcox(x, idx, lam, constant),
                 )
 
             # Test variance stationarity for each transformed series
