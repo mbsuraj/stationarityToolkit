@@ -8,3 +8,4 @@ temp_unpack
 *.txt
 *.egg-info
 *.pyc
+.vscode
