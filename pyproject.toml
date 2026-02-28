@@ -4,17 +4,31 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stationaritytoolkit"
-version = "0.1.5"
+version = "1.0.0"
 authors = [
   { name="Bhanu Suraj Malla", email="bsmalla@asu.edu" },
 ]
-description = "Test and Convert non-stationary time-series to stationary"
+description = "Comprehensive time series stationarity analysis with rigorous statistical testing across trend, variance, and seasonality"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.20.0",
+    "pandas>=1.3.0",
+    "scipy>=1.7.0",
+    "statsmodels>=0.13.0",
+    "arch>=5.0.0",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: Other/Proprietary License",
+    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=3.0.0",
+    "matplotlib>=3.4.0",
 ]
 
 [project.urls]

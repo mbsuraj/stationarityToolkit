@@ -1,0 +1,13 @@
+venv
+dist
+.idea
+*.ipynb
+*.csv
+.DS_Store
+temp_unpack
+*.txt
+*.egg-info
+*.pyc
+.vscode
+venv1
+.kiro

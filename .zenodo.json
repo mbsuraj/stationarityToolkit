@@ -1,0 +1,32 @@
+{
+  "title": "StationarityToolkit: Comprehensive Time Series Stationarity Analysis",
+  "description": "A Python library for detecting and addressing non-stationarity in time series data through rigorous statistical testing across trend, variance, and seasonality dimensions. Implements 15 statistical tests including ADF, KPSS, Phillips-Perron, Zivot-Andrews, Levene, Bartlett, White, ARCH, ACF/PACF, STL, Canova-Hansen, OCSB, and Spectral Analysis.",
+  "creators": [
+    {
+      "name": "Malla, Bhanu Suraj",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "keywords": [
+    "time-series",
+    "stationarity",
+    "statistical-tests",
+    "trend-analysis",
+    "variance-analysis",
+    "seasonality",
+    "python",
+    "data-science",
+    "forecasting",
+    "ARIMA"
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/mbsuraj/stationarityToolkit",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
