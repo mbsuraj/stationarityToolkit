@@ -5,12 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "stationaritytoolkit"
 version = "1.0.0"
-authors = [
-  { name="Bhanu Suraj Malla", email="bsmalla@asu.edu" },
-]
 description = "Comprehensive time series stationarity analysis with rigorous statistical testing across trend, variance, and seasonality"
 readme = "README.md"
 requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  { name="Bhanu Suraj Malla", email="bsmalla@asu.edu" },
+]
 dependencies = [
     "numpy>=1.20.0",
     "pandas>=1.3.0",
@@ -20,7 +21,6 @@ dependencies = [
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
