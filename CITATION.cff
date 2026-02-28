@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Malla"
+    given-names: "Bhanu Suraj"
+    email: "bsmalla@asu.edu"
+title: "StationarityToolkit: Comprehensive Time Series Stationarity Analysis"
+version: 1.0.0
+date-released: 2024-12-01
+url: "https://github.com/mbsuraj/stationarityToolkit"
+repository-code: "https://github.com/mbsuraj/stationarityToolkit"
+keywords:
+  - time-series
+  - stationarity
+  - statistical-tests
+  - trend-analysis
+  - variance-analysis
+  - seasonality
+  - python
+license: MIT

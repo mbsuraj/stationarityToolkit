@@ -9,3 +9,5 @@ temp_unpack
 *.egg-info
 *.pyc
 .vscode
+venv1
+.kiro
