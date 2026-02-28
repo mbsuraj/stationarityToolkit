@@ -1,5 +1,7 @@
 # StationarityToolkit
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18818474.svg)](https://doi.org/10.5281/zenodo.18818474)
+
 A comprehensive Python library for time series stationarity analysis. Provides 15 statistical tests with clear diagnostics and actionable transformation guidance.
 
 ## What This Does
@@ -224,7 +226,8 @@ If you use this toolkit in your research, please cite:
   title={StationarityToolkit: Comprehensive Time Series Stationarity Analysis},
   author={Malla, Bhanu Suraj},
   year={2024},
-  url={https://github.com/mbsuraj/stationarityToolkit}
+  url={https://github.com/mbsuraj/stationarityToolkit},
+  doi={10.5281/zenodo.18818474}
 }
 ```
 
