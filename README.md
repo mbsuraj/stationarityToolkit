@@ -1,16 +1,22 @@
 # StationarityToolkit
 
-A comprehensive Python library for detecting and addressing non-stationarity in time series data through rigorous statistical testing across trend, variance, and seasonality dimensions.
+A comprehensive Python library for time series stationarity analysis. Provides 15 statistical tests with clear diagnostics and actionable transformation guidance.
 
-## Overview
+## What This Does
 
-StationarityToolkit provides a systematic framework for time series stationarity analysis using multiple statistical tests. The toolkit implements a strict definition of stationarity: any deviation from constant mean, constant variance, or presence of seasonality is flagged as non-stationary.
+StationarityToolkit runs comprehensive stationarity checks across three dimensions: trend (unit roots, deterministic trends, structural breaks), variance (heteroskedasticity, volatility clustering), and seasonality (periodic patterns, seasonal unit roots). You get 6 trend tests, 4 variance tests, and 5 seasonal tests—all in one run. Each test returns not just pass/fail, but actionable notes indicating the appropriate transformation: differencing for unit roots, detrending for deterministic trends, Box-Cox for variance instability, seasonal differencing for seasonality, or GARCH modeling for volatility clustering.
+
+## Why Use This
+
+Most toolkits provide limited testing and require manual interpretation of results. This toolkit runs a comprehensive suite of tests, identifies the specific type of non-stationarity (unit root vs deterministic trend vs variance instability), and provides clear guidance on the appropriate transformation. If you're a data scientist, researcher, or analyst working with time series and need to prepare data for forecasting models (like ARIMA, VAR) or statistical analysis, this toolkit streamlines the diagnostic process.
 
 ## Installation
 
 ```bash
 pip install stationarity-toolkit
 ```
+
+**Requirements**: Python ≥3.10, pandas, numpy, scipy, statsmodels, arch
 
 ## Quick Start
 
@@ -42,163 +48,61 @@ result.report(filepath='stationarity_report.md')
 
 ## Statistical Tests
 
-### Trend Tests (6 tests)
-- **ADF (Augmented Dickey-Fuller)**: Tests for unit roots vs deterministic trends using 4-case logic
-- **KPSS (Kwiatkowski-Phillips-Schmidt-Shin)**: Complements ADF with reverse null hypothesis
-- **Phillips-Perron**: Non-parametric unit root test robust to heteroskedasticity
-- **Zivot-Andrews**: Detects structural breaks (level shifts, trend shifts, or both)
+The toolkit runs 15 tests across three categories. Here's what each test does:
 
-### Variance Tests (4 tests)
-- **Levene's Test**: Detects variance changes across segmented series
-- **Bartlett's Test**: Similar to Levene but assumes normality
-- **White's Test**: Detects time-dependent variance patterns (heteroskedasticity)
-- **ARCH Test**: Detects volatility clustering (time-varying conditional variance)
+**Trend Tests (6 tests)** check for constant mean. ADF (Augmented Dickey-Fuller) tests for unit roots vs deterministic trends using 4-case logic. KPSS (Kwiatkowski-Phillips-Schmidt-Shin) complements ADF with a reverse null hypothesis. Phillips-Perron is a non-parametric unit root test robust to heteroskedasticity. Zivot-Andrews detects structural breaks and pinpoints their location (level shifts, trend shifts, or both).
 
-### Seasonal Tests (5 tests)
-- **ACF/PACF Peak Detection**: Identifies seasonality through autocorrelation peaks at contextual periods
-- **STL Decomposition**: Tests significance of seasonal component via variance comparison
-- **Canova-Hansen**: Tests for seasonal unit roots (deterministic vs stochastic seasonality)
-- **OCSB**: Regression-based seasonal unit root test
-- **Spectral Analysis**: Frequency-domain periodogram analysis for periodic components
+**Variance Tests (4 tests)** check for constant variance. Levene's Test detects variance changes across segmented series. Bartlett's Test is similar to Levene but assumes normality. White's Test detects time-dependent variance patterns (heteroskedasticity). ARCH Test detects volatility clustering (time-varying conditional variance).
+
+**Seasonal Tests (5 tests)** check for periodic patterns; contextual lag periods used based on given time-series freq. ACF/PACF Peak Detection identifies seasonality through autocorrelation peaks at contextual periods. STL Decomposition tests the significance of seasonal components via variance comparison. Canova-Hansen tests for seasonal unit roots (deterministic vs stochastic seasonality). OCSB is a regression-based seasonal unit root test. Spectral Analysis uses frequency-domain periodogram analysis to find periodic components.
 
 ## Workflow: How to Use the Toolkit
 
 ### Step 1: Run Initial Detection
 
+Start by running the toolkit on your time series. Use `verbosity='detailed'` to get the full report with all test results and actionable notes.
+
 ```python
 result = toolkit.detect(ts, verbosity='detailed')
 ```
 
-Check the summary:
-- If all three categories are stationary → proceed with modeling
-- If any are non-stationary → follow the transformation workflow below
+Check the summary. If all three categories (trend, variance, seasonality) are stationary, you can proceed with modeling. If any are non-stationary, follow the transformation workflow below.
 
 ### Step 2: Address Non-Stationarity (Order Matters!)
 
-**Important**: Always address issues in this order: Variance → Trend → Seasonality
+When transforming non-stationary data, always address issues in this order: Variance → Trend → Seasonality. This sequence matters because unstable variance affects the reliability of trend and seasonal tests, and unremoved trends can obscure seasonal patterns. See [Why Order Matters](#why-order-matters-variance--trend--seasonality) for the reasoning behind this sequence.
 
 #### 2.1 Stabilize Variance First
 
-Variance instability affects the reliability of trend and seasonal tests. Address variance issues before anything else.
-
-**Levene's Test / Bartlett's Test**
-- **Detection**: Variance changes across segmented series
-- **Action**: Apply Box-Cox transform (for positive data) or Yeo-Johnson transform (handles negative values)
-- **Note**: Box-Cox includes log transform (λ=0), so just use Box-Cox for positive data
-
-```python
-from scipy.stats import boxcox, yeojohnson
-
-# For positive data
-ts_transformed, lambda_param = boxcox(ts)
-
-# For data with negatives
-ts_transformed, lambda_param = yeojohnson(ts)
-```
-
-**White's Test**
-- **Detection**: Time-dependent variance patterns (heteroskedasticity)
-- **Action**: Same as above - apply Box-Cox or Yeo-Johnson transform
-
-**ARCH Test**
-- **Detection**: Volatility clustering (GARCH effects)
-- **Action**: After addressing trend/seasonality, model the variance using GARCH
-- **Note**: GARCH models time-varying variance, not the mean. Use after making series stationary in mean.
-
-```python
-from arch import arch_model
-
-# After trend/seasonality are addressed
-model = arch_model(ts_stationary, vol='Garch', p=1, q=1)
-result = model.fit()
-```
-
-**After variance transformation**: Re-run the toolkit to verify variance is now stationary.
+If Levene's, Bartlett's, or White's tests detect variance instability, consider power transformations like Box-Cox (for positive data) or Yeo-Johnson (handles negative values). If the ARCH test detects volatility clustering, you may need GARCH modeling after addressing trend and seasonality. The toolkit's notes will guide you on which issue was detected.
 
 #### 2.2 Address Trend (After Variance is Stable)
 
-**ADF / KPSS / Phillips-Perron: Unit Root Detected**
-- **Detection**: Series has a unit root (random walk behavior)
-- **Action**: Apply first-order differencing
-
-```python
-ts_diff = ts.diff().dropna()
-```
-
-**ADF / KPSS / Phillips-Perron: Deterministic Trend Detected**
-- **Detection**: Series has a deterministic (predictable) trend
-- **Action**: Detrend by subtracting fitted trend
-
-```python
-from scipy.signal import detrend
-
-ts_detrended = pd.Series(detrend(ts.values), index=ts.index)
-```
-
-**Zivot-Andrews: Structural Break Detected**
-- **Detection**: Structural break at specific observation (level shift, trend shift, or both)
-- **Action**: Handle breaks using one of these approaches:
-  1. Add dummy variables at break points
-  2. Split series into segments and model separately
-  3. Use piecewise regression
-
-```python
-# Example: dummy variable approach
-break_point = 99  # from ZA test output
-ts['break_dummy'] = (ts.index >= break_point).astype(int)
-```
-
-**After trend transformation**: Re-run the toolkit to verify trend stationarity.
+If ADF, KPSS, or Phillips-Perron detect a unit root, differencing is typically needed. If they detect a deterministic trend, detrending (removing the fitted trend) is appropriate. If Zivot-Andrews detects structural breaks, consider approaches like dummy variables at break points, splitting the series into segments, or piecewise regression. The 4-case logic in the test notes will tell you which situation applies (see [4-Case Logic for Trend Tests](#4-case-logic-for-trend-tests) for details).
 
 #### 2.3 Address Seasonality (Last)
 
-**ACF / STL / Canova-Hansen / OCSB / Spectral: Seasonality Detected**
-- **Detection**: Seasonal patterns at detected period (e.g., 52 for weekly data with yearly seasonality)
-- **Action**: Apply seasonal differencing
+If ACF, STL, Canova-Hansen, OCSB, or Spectral tests detect seasonal patterns, seasonal differencing at the detected period is a common approach. Alternatively, STL decomposition can separate the seasonal component, allowing you to model the residuals. The toolkit reports the detected period (e.g., 52 for yearly seasonality in weekly data).
 
-```python
-# For period = 52 (yearly seasonality in weekly data)
-ts_seasonal_diff = ts.diff(periods=52).dropna()
-```
-
-**Alternative**: Use STL decomposition and model the residuals
-
-```python
-from statsmodels.tsa.seasonal import STL
-
-stl = STL(ts, period=52, seasonal=13)
-result = stl.fit()
-ts_residual = result.resid  # Model this
-```
-
-**After seasonal transformation**: Re-run the toolkit to verify seasonal stationarity.
+After each transformation, re-run the toolkit to verify stationarity has been achieved. Sometimes multiple iterations are needed—for example, differencing might introduce new variance patterns requiring stabilization.
 
 ### Step 3: Iterate Until Stationary
 
-After each transformation, re-run the toolkit:
+After each transformation, re-run the toolkit to check if stationarity has been achieved:
 
 ```python
 result = toolkit.detect(ts_transformed, verbosity='detailed')
 ```
 
-Continue transforming until all three categories (trend, variance, seasonality) are stationary.
+Continue transforming until all three categories (trend, variance, seasonality) are stationary. Sometimes multiple iterations are needed—for example, differencing might introduce new variance patterns that require stabilization.
 
 ### Step 4: Model the Stationary Series
 
-Once stationary, proceed with your time series modeling:
-- ARIMA / SARIMA
-- VAR (Vector Autoregression)
-- Linear regression with time series features
-- Machine learning models (LSTM, XGBoost, etc.)
+Once your series is stationary across all three dimensions, proceed with time series modeling. Common approaches include ARIMA/SARIMA for univariate forecasting, VAR for multivariate analysis, or linear regression with time series features. Note that some machine learning models (like tree-based methods and neural networks) can handle non-stationary data directly, but stationary data may still improve generalization and reduce distribution shift.
 
 ## Understanding Test Results
 
-Each test returns:
-- **Result**: ✅ Stationary or ❌ Non-stationary
-- **Note**: Actionable guidance on what to do if non-stationary
-- **Interpretation**: Brief technical interpretation with null hypothesis (H0)
-- **Statistic**: Test statistic value
-- **P-value**: Statistical significance
+Each test returns four key pieces of information: a pass/fail result (✅ Stationary or ❌ Non-stationary), an actionable note indicating what transformation to apply if non-stationary, a brief technical interpretation with the null hypothesis (H0), and the test statistic and p-value for statistical significance.
 
 ### Example Output
 
@@ -213,29 +117,35 @@ Each test returns:
 
 ## Key Concepts
 
+## Key Concepts
+
 ### Why Order Matters: Variance → Trend → Seasonality
 
-1. **Variance first**: Unstable variance affects the reliability of all other tests. Stabilizing variance ensures accurate trend and seasonal detection.
+When transforming non-stationary data, the sequence matters. Start with variance stabilization because unstable variance throws off the reliability of trend and seasonal tests—you might miss a unit root or misidentify seasonality if variance is jumping around. Once variance is stable, address trend next. Trend affects the mean level of your series, and if you try to detect seasonality while a strong trend is present, you'll get confused signals. Remove the trend first, then seasonal patterns become clear and easy to identify. Think of it like cleaning a dataset: fix the noise (variance), remove the drift (trend), then handle the cycles (seasonality).
 
-2. **Trend second**: Trend affects the mean level. Removing trend before seasonality ensures seasonal patterns are properly identified.
+### Comprehensive Testing, Informed Decisions
 
-3. **Seasonality last**: Seasonal patterns are easier to detect and remove once variance is stable and trend is removed.
+This toolkit runs every relevant test and reports all results—not just a single pass/fail verdict. You get detailed diagnostics across trend (constant mean), variance (constant variance), and seasonality (no periodic patterns). The goal isn't to force a rigid definition of stationarity, but to give you complete information so you can make informed decisions. Maybe your use case can tolerate mild heteroskedasticity but absolutely needs no trend. Maybe you're okay with deterministic seasonality but need to eliminate stochastic trends. The toolkit shows you what's happening in your data, and you decide what matters for your specific analysis or model. Flexibility through transparency.
 
-### Strict Stationarity Definition
+### 4-Case Logic for Trend Tests
 
-This toolkit uses a strict definition:
-- **Trend stationary**: Constant mean (no unit roots, no deterministic trends, no structural breaks)
-- **Variance stationary**: Constant variance (no heteroskedasticity, no volatility clustering)
-- **Seasonal stationary**: No seasonal patterns (no periodic components at any frequency)
+When testing for trend non-stationarity, unit root tests (ADF, KPSS, Phillips-Perron) face a challenge: they need to distinguish between unit roots (random walk behavior requiring differencing) and deterministic trends (predictable drift requiring detrending). The toolkit runs each test twice—once with just a constant ('c') and once with constant plus trend ('ct'). If both pass, you're stationary. If only 'c' passes, you're stationary around a constant. If only 'ct' passes, you have a deterministic trend. If both fail, you have a unit root. 
 
-### 4-Case Logic for Unit Root Tests
+The toolkit's report notes automatically identify which case applies and tell you the exact transformation needed:
 
-ADF, KPSS, and Phillips-Perron tests run both 'c' (constant) and 'ct' (constant + trend) specifications:
+**Example: Unit root detected (both 'c' and 'ct' fail)**
+```
+- Note: Unit root detected - requires differencing
+- Interpretation: H0: Unit root. ADF-c p=0.2341, ADF-ct p=0.3456 >= 0.05. Fail to reject H0.
+```
 
-1. **Both stationary** → Series is stationary
-2. **'c' stationary, 'ct' not** → Series is stationary (around constant)
-3. **'c' not, 'ct' stationary** → Deterministic trend present (detrend needed)
-4. **Both non-stationary** → Unit root present (differencing needed)
+**Example: Deterministic trend detected ('c' fails, 'ct' passes)**
+```
+- Note: Deterministic trend detected - stationary after detrending
+- Interpretation: H0: Unit root. ADF-c p=0.1234 >= 0.05, ADF-ct p=0.0123 < 0.05. Deterministic trend.
+```
+
+No guesswork, just clear guidance based on the 4-case analysis.
 
 ## API Reference
 
@@ -270,7 +180,7 @@ toolkit = StationarityToolkit(alpha=0.05)
 
 ## Contextual Period Detection
 
-The toolkit automatically detects expected seasonal periods based on your time series frequency:
+The toolkit automatically detects expected seasonal periods to test for seasonal non-stationarity based on your time series frequency:
 
 - **Daily** ('D'): Tests for weekly (7), monthly (30), and yearly (365) seasonality
 - **Hourly** ('H'): Tests for daily (24) and weekly (168) seasonality
@@ -278,7 +188,7 @@ The toolkit automatically detects expected seasonal periods based on your time s
 - **Weekly** ('W'): Tests for yearly (52) seasonality
 - **Quarterly** ('Q'): Tests for yearly (4) seasonality
 
-Ensure your time series has a proper frequency set:
+Although the toolkit is capable of detecting time-series freq automatically, it is recommended to provide time series freq when loading the data:
 
 ```python
 ts = pd.Series(values, index=pd.DatetimeIndex(dates, freq='W-MON'))
@@ -287,7 +197,7 @@ ts = pd.Series(values, index=pd.DatetimeIndex(dates, freq='W-MON'))
 ## Why Stationarity Matters
 
 Many time series methods assume or benefit from stationarity:
-- **Classical models**: ARIMA, VAR, exponential smoothing require stationarity
+- **Classical models**: ARIMA, VAR require stationarity
 - **Statistical tests**: Granger causality, cointegration assume stationarity
 - **Machine learning**: While not strictly required, stationary data can improve generalization and reduce distribution shift
 
