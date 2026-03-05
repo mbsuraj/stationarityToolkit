@@ -278,10 +278,10 @@ def arch_test(
         is_stationary = lm_pvalue > alpha
         
         if is_stationary:
-            educational_note = "Constant variance across time"
+            educational_note = "No volatility clustering detected (ARCH tests for clustered variance, not smooth changes)"
             interpretation = f"H0: No ARCH effects. ARCH p={lm_pvalue:.4f} > {alpha}. Fail to reject H0."
         else:
-            educational_note = "Volatility clustering detected - consider GARCH modeling for variance (models time-varying variance)"
+            educational_note = "Volatility clustering detected - consider GARCH modeling (may trigger on trend/seasonality if present)"
             interpretation = f"H0: No ARCH effects. ARCH p={lm_pvalue:.4f} <= {alpha}. Reject H0."
         
         return TestResult(

@@ -2,23 +2,21 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18818474.svg)](https://doi.org/10.5281/zenodo.18818474)
 
-A comprehensive Python library for time series stationarity analysis. Provides 15 statistical tests with clear diagnostics and actionable transformation guidance.
+A comprehensive Python library for time series stationarity analysis. Provides 13 statistical tests with clear diagnostics and actionable transformation guidance.
 
 ## What This Does
 
-StationarityToolkit runs comprehensive stationarity checks across three dimensions: trend (unit roots, deterministic trends, structural breaks), variance (heteroskedasticity, volatility clustering), and seasonality (periodic patterns, seasonal unit roots). You get 6 trend tests, 4 variance tests, and 5 seasonal tests—all in one run. Each test returns not just pass/fail, but actionable notes indicating the appropriate transformation: differencing for unit roots, detrending for deterministic trends, Box-Cox for variance instability, seasonal differencing for seasonality, or GARCH modeling for volatility clustering.
+StationarityToolkit runs comprehensive stationarity checks across three dimensions: trend (unit roots, deterministic trends, structural breaks), variance (heteroskedasticity, volatility clustering), and seasonality (periodic patterns, seasonal unit roots). You get 4 trend tests, 4 variance tests, and 3 seasonal tests—all in one run. Each test returns not just pass/fail, but actionable notes indicating the appropriate transformation: differencing for unit roots, detrending for deterministic trends, Box-Cox for variance instability, seasonal differencing for seasonality, or GARCH modeling for volatility clustering.
 
 ## Why Use This
 
-Most toolkits provide limited testing and require manual interpretation of results. This toolkit runs a comprehensive suite of tests, identifies the specific type of non-stationarity (unit root vs deterministic trend vs variance instability), and provides clear guidance on the appropriate transformation. If you're a data scientist, researcher, or analyst working with time series and need to prepare data for forecasting models (like ARIMA, VAR) or statistical analysis, this toolkit streamlines the diagnostic process.
+Most toolkits provide limited testing and require manual interpretation of results. This toolkit runs a comprehensive suite of tests, identifies the specific type of non-stationarity (unit root vs deterministic trend vs variance instability), and suggests potential transformations. More importantly, it reveals what's actually happening in your data at each step, enabling iterative test-transform-retest workflows where you make informed decisions based on your specific use case.
 
 ## Installation
 
 ```bash
 pip install stationarity-toolkit
 ```
-
-**Requirements**: Python ≥3.10, pandas, numpy, scipy, statsmodels, arch
 
 ## Quick Start
 
@@ -36,27 +34,30 @@ toolkit = StationarityToolkit(alpha=0.05)
 # Run detection
 result = toolkit.detect(ts, verbosity='detailed')
 
-# View results
-print(f"Trend stationary: {result.trend_stationary}")
-print(f"Variance stationary: {result.variance_stationary}")
-print(f"Seasonal stationary: {result.seasonal_stationary}")
+# View summary
+print(result.summary)
 
-# Generate detailed report
-print(result.report())
+# View detailed results as DataFrame
+result.report()
 
 # Save report to file
 result.report(filepath='stationarity_report.md')
 ```
 
+## Examples
+
+- **[Basic Usage](examples/basic_usage.py)**: Simple example showing core functionality
+- **[Detailed Usage](examples/detailed_usage.ipynb)**: Comprehensive notebook demonstrating toolkit validation, transformation workflows, and real-world applications
+
 ## Statistical Tests
 
-The toolkit runs 15 tests across three categories. Here's what each test does:
+The toolkit runs 13 tests across three categories. Here's what each test does:
 
-**Trend Tests (6 tests)** check for constant mean. ADF (Augmented Dickey-Fuller) tests for unit roots vs deterministic trends using 4-case logic. KPSS (Kwiatkowski-Phillips-Schmidt-Shin) complements ADF with a reverse null hypothesis. Phillips-Perron is a non-parametric unit root test robust to heteroskedasticity. Zivot-Andrews detects structural breaks and pinpoints their location (level shifts, trend shifts, or both).
+**Trend Tests (4 tests)** check for constant mean. ADF (Augmented Dickey-Fuller) tests for unit roots vs deterministic trends using 4-case logic. KPSS (Kwiatkowski-Phillips-Schmidt-Shin) complements ADF with a reverse null hypothesis. Phillips-Perron is a non-parametric unit root test robust to heteroskedasticity. Zivot-Andrews detects structural breaks (discrete regime changes, not smooth trends) and pinpoints their location.
 
-**Variance Tests (4 tests)** check for constant variance. Levene's Test detects variance changes across segmented series. Bartlett's Test is similar to Levene but assumes normality. White's Test detects time-dependent variance patterns (heteroskedasticity). ARCH Test detects volatility clustering (time-varying conditional variance).
+**Variance Tests (4 tests)** check for constant variance. Levene's Test detects variance changes across segmented series. Bartlett's Test is similar to Levene but assumes normality. White's Test detects time-dependent variance patterns (heteroskedasticity). ARCH Test detects volatility clustering (time-varying conditional variance) - may trigger on trend/seasonality if present.
 
-**Seasonal Tests (5 tests)** check for periodic patterns; contextual lag periods used based on given time-series freq. ACF/PACF Peak Detection identifies seasonality through autocorrelation peaks at contextual periods. STL Decomposition tests the significance of seasonal components via variance comparison. Canova-Hansen tests for seasonal unit roots (deterministic vs stochastic seasonality). OCSB is a regression-based seasonal unit root test. Spectral Analysis uses frequency-domain periodogram analysis to find periodic components.
+**Seasonal Tests (3 tests)** check for periodic patterns; contextual lag periods used based on given time-series freq. ACF/PACF Peak Detection identifies seasonality through autocorrelation peaks at contextual periods (may trigger on trend/variance). STL Decomposition tests the significance of seasonal components via variance comparison (detects deterministic seasonality). OCSB is a regression-based seasonal unit root test (detects stochastic seasonality, not fixed patterns - use STL for deterministic).
 
 ## Workflow: How to Use the Toolkit
 
@@ -84,7 +85,7 @@ If ADF, KPSS, or Phillips-Perron detect a unit root, differencing is typically n
 
 #### 2.3 Address Seasonality (Last)
 
-If ACF, STL, Canova-Hansen, OCSB, or Spectral tests detect seasonal patterns, seasonal differencing at the detected period is a common approach. Alternatively, STL decomposition can separate the seasonal component, allowing you to model the residuals. The toolkit reports the detected period (e.g., 52 for yearly seasonality in weekly data).
+If ACF, STL, or OCSB tests detect seasonal patterns, seasonal differencing at the detected period is a common approach. Alternatively, STL decomposition can separate the seasonal component, allowing you to model the residuals. The toolkit reports the detected period (e.g., 52 for yearly seasonality in weekly data). Note: OCSB detects stochastic (random-walk) seasonality, while STL detects deterministic (fixed) patterns.
 
 After each transformation, re-run the toolkit to verify stationarity has been achieved. Sometimes multiple iterations are needed—for example, differencing might introduce new variance patterns requiring stabilization.
 
@@ -161,24 +162,25 @@ toolkit = StationarityToolkit(alpha=0.05)
 - `alpha` (float): Significance level for all tests (default: 0.05)
 
 **Methods**:
-- `detect(timeseries, verbosity='minimal')`: Run all tests and return results
-  - `verbosity`: 'minimal' or 'detailed'
+- `detect(timeseries, verbosity='detailed')`: Run all tests and return results
+  - `verbosity`: 'minimal' or 'detailed' (default: 'detailed')
   - Returns: `DetectionResult` object
 
 ### DetectionResult
+
+**Properties**:
+- `summary` (str): 3-line summary of stationarity status (Trend/Variance/Seasonal)
 
 **Attributes**:
 - `trend_stationary` (bool): True if all trend tests pass
 - `variance_stationary` (bool): True if all variance tests pass
 - `seasonal_stationary` (bool): True if all seasonal tests pass
-- `trend_results` (list): Individual trend test results
-- `variance_results` (list): Individual variance test results
-- `seasonal_results` (list): Individual seasonal test results
+- `tests` (dict): Dictionary of test results by category
 
 **Methods**:
-- `report(filepath=None)`: Generate markdown report
-  - If `filepath` provided, saves to file
-  - Returns: Report string
+- `report(filepath=None)`: Generate report as DataFrame and optionally save markdown to file
+  - If `filepath` provided, writes markdown report to file
+  - Returns: pandas DataFrame with all test results
 
 ## Contextual Period Detection
 
@@ -198,16 +200,9 @@ ts = pd.Series(values, index=pd.DatetimeIndex(dates, freq='W-MON'))
 
 ## Why Stationarity Matters
 
-Many time series methods assume or benefit from stationarity:
-- **Classical models**: ARIMA, VAR require stationarity
-- **Statistical tests**: Granger causality, cointegration assume stationarity
-- **Machine learning**: While not strictly required, stationary data can improve generalization and reduce distribution shift
+Stationarity isn't just a theoretical requirement—it's fundamental to how many time series methods work. Classical models like ARIMA and VAR are built on the assumption that your data's statistical properties don't change over time. Statistical tests like Granger causality and cointegration analysis require stationarity to produce valid results. Even machine learning models, while not strictly requiring stationarity and vary greatly by use-case, often generalize better and suffer less from distribution shift when trained on stationary data.
 
-Non-stationary data can lead to:
-- Spurious regressions (false relationships)
-- Poor forecast accuracy
-- Invalid statistical inferences
-- Model instability
+When you ignore non-stationarity, things go wrong in predictable ways. You get spurious regressions where variables appear related but aren't. Your forecasts become unreliable because the model learned patterns that don't hold in the future. Statistical inferences become invalid because the assumptions underlying your tests are violated. And your models become unstable, performing well on training data but failing on new data. Stationarity testing isn't about following rules—it's about ensuring your analysis reflects reality.
 
 ## License
 

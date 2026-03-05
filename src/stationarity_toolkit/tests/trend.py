@@ -247,8 +247,9 @@ def zivot_andrews_test(
     """
     Perform Zivot-Andrews test for structural breaks in trend.
 
-    Runs all three break types ('c', 't', 'ct') to detect level shifts, trend shifts,
-    or both. Under strict stationarity, any structural break indicates non-stationarity.
+    Detects discrete structural breaks (regime changes, level/trend shifts).
+    Does NOT detect smooth trends - use ADF/PP/KPSS for that.
+    May find spurious breaks in pure noise.
 
     Null Hypothesis: Unit root with no structural break
     Alternative: Trend stationary with structural break
@@ -284,15 +285,44 @@ def zivot_andrews_test(
                     'breakpoint': int(za_result[4])
                 }
         
-        # Check which tests reject null (indicate break-stationarity)
-        c_break = results['c']['pvalue'] < alpha
-        t_break = results['t']['pvalue'] < alpha
-        ct_break = results['ct']['pvalue'] < alpha
+        # Check which tests reject null (p < alpha means reject unit root = stationary)
+        c_reject = results['c']['pvalue'] < alpha
+        t_reject = results['t']['pvalue'] < alpha
+        ct_reject = results['ct']['pvalue'] < alpha
         
-        # Under strict stationarity: any break means non-stationary
-        if not c_break and not t_break and not ct_break:
+        # If any test rejects unit root, series is stationary (with possible break)
+        if c_reject or t_reject or ct_reject:
+            is_stationary = True
+            breaks_detected = []
+            if c_reject:
+                breaks_detected.append(f"level shift at obs {results['c']['breakpoint']}")
+            if t_reject:
+                breaks_detected.append(f"trend shift at obs {results['t']['breakpoint']}")
+            if ct_reject:
+                breaks_detected.append(f"level+trend shift at obs {results['ct']['breakpoint']}")
+            
+            educational_note = f"Stationary with structural breaks: {', '.join(breaks_detected)}. Note: ZA detects discrete breaks, not smooth trends. Breaks may be spurious in noise."
+            
+            p_vals = []
+            if c_reject:
+                p_vals.append(f"ZA-c p={results['c']['pvalue']:.4f}")
+            if t_reject:
+                p_vals.append(f"ZA-t p={results['t']['pvalue']:.4f}")
+            if ct_reject:
+                p_vals.append(f"ZA-ct p={results['ct']['pvalue']:.4f}")
+            
+            interpretation = f"H0: Unit root with no break. {', '.join(p_vals)} < {alpha}. Reject H0 - stationary."
+            
+            # Use the most significant result
+            min_p = min(results['c']['pvalue'], results['t']['pvalue'], results['ct']['pvalue'])
+            for trend_type, res in results.items():
+                if res['pvalue'] == min_p:
+                    test_statistic = res['stat']
+                    p_value = res['pvalue']
+                    break
+        else:
             is_stationary = False
-            educational_note = "Unit root detected - no structural break found"
+            educational_note = "Unit root detected - consider differencing"
             interpretation = (
                 f"H0: Unit root with no break. "
                 f"ZA-c p={results['c']['pvalue']:.4f}, "
@@ -302,35 +332,6 @@ def zivot_andrews_test(
             )
             test_statistic = results['c']['stat']
             p_value = results['c']['pvalue']
-        else:
-            is_stationary = False
-            breaks_detected = []
-            if c_break:
-                breaks_detected.append(f"level shift at obs {results['c']['breakpoint']}")
-            if t_break:
-                breaks_detected.append(f"trend shift at obs {results['t']['breakpoint']}")
-            if ct_break:
-                breaks_detected.append(f"level+trend shift at obs {results['ct']['breakpoint']}")
-            
-            educational_note = f"Structural break detected: {', '.join(breaks_detected)}"
-            
-            p_vals = []
-            if c_break:
-                p_vals.append(f"ZA-c p={results['c']['pvalue']:.4f}")
-            if t_break:
-                p_vals.append(f"ZA-t p={results['t']['pvalue']:.4f}")
-            if ct_break:
-                p_vals.append(f"ZA-ct p={results['ct']['pvalue']:.4f}")
-            
-            interpretation = f"H0: Unit root with no break. {', '.join(p_vals)} < {alpha}. Structural break present."
-            
-            # Use the most significant result
-            min_p = min(results['c']['pvalue'], results['t']['pvalue'], results['ct']['pvalue'])
-            for trend_type, res in results.items():
-                if res['pvalue'] == min_p:
-                    test_statistic = res['stat']
-                    p_value = res['pvalue']
-                    break
         
         return TestResult(
             test_name="Zivot-Andrews Test for Structural Breaks",

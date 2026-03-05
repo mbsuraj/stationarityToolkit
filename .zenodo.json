@@ -1,6 +1,6 @@
 {
   "title": "StationarityToolkit: Comprehensive Time Series Stationarity Analysis",
-  "description": "A Python library for detecting and addressing non-stationarity in time series data through rigorous statistical testing across trend, variance, and seasonality dimensions. Implements 15 statistical tests including ADF, KPSS, Phillips-Perron, Zivot-Andrews, Levene, Bartlett, White, ARCH, ACF/PACF, STL, Canova-Hansen, OCSB, and Spectral Analysis.",
+  "description": "A Python library for detecting and addressing non-stationarity in time series data through rigorous statistical testing across trend, variance, and seasonality dimensions. Implements 13 statistical tests including ADF, KPSS, Phillips-Perron, Zivot-Andrews, Levene, Bartlett, White, ARCH, ACF/PACF, STL, and OCSB.",
   "creators": [
     {
       "name": "Malla, Bhanu Suraj",

@@ -31,6 +31,7 @@ def acf_peak_test(
         TestResult object with peak detection results
     """
     from ..utils import get_contextual_periods
+    from statsmodels.stats.diagnostic import acorr_ljungbox
     
     ts = timeseries.dropna()
     
@@ -44,58 +45,53 @@ def acf_peak_test(
     max_expected = max(expected_periods) if expected_periods else 40
     
     if nlags is None:
-        nlags = min(len(ts) // 2, max(max_expected + 10, 40))
-    
-    ts = ts.values
+        # Need at least 2 multiples of largest expected period
+        min_required = max_expected * 2 if expected_periods else 40
+        nlags = min(len(ts) // 2, max(min_required, 40))
     
     try:
-        acf_values = acf(ts, nlags=nlags, fft=False)
-        
-        # Confidence interval: ±threshold/sqrt(n)
-        conf_interval = threshold / np.sqrt(len(ts))
-        
-        # Find significant peaks (excluding lag 0)
-        significant_lags = []
-        for lag in range(1, len(acf_values)):
-            if abs(acf_values[lag]) > conf_interval:
-                significant_lags.append((lag, acf_values[lag]))
-        
-        # Check for regular spacing in significant lags
+        # Use Ljung-Box test on seasonal lags for statistical rigor
         has_seasonality = False
         detected_periods = []
+        min_p_value = 1.0
         
-        if len(significant_lags) >= 1:
-            lags_only = [lag for lag, _ in significant_lags]
+        for period in expected_periods:
+            if period >= len(ts) // 3:
+                continue
             
-            # ONLY check contextual periods - no fallback to arbitrary search
-            for period in expected_periods:
-                if period > nlags:
-                    continue
-                multiples = [period * i for i in range(1, nlags // period + 1) if period * i <= nlags]
-                matches = sum(1 for m in multiples if any(abs(m - lag) <= 1 for lag in lags_only))
+            # Test multiple consecutive multiples of the period
+            max_mult = min(3, nlags // period)
+            if max_mult < 2:
+                continue
                 
-                # For long periods (>nlags/2), 1 match is enough; otherwise need 2
-                required_matches = 1 if period > nlags // 2 else 2
-                if matches >= required_matches:
+            seasonal_lags = [period * i for i in range(1, max_mult + 1)]
+            
+            try:
+                lb_result = acorr_ljungbox(ts, lags=seasonal_lags, return_df=True)
+                # Check if at least 2 consecutive multiples are significant
+                significant_lags = (lb_result['lb_pvalue'] < alpha).sum()
+                
+                if significant_lags >= 2:
                     has_seasonality = True
                     detected_periods.append(period)
+                    min_p_value = min(min_p_value, lb_result['lb_pvalue'].min())
+            except:
+                continue
         
         is_stationary = not has_seasonality
         
-        # Calculate test statistic as max absolute ACF value
+        # Calculate test statistic as max absolute ACF value for reporting
+        acf_values = acf(ts.values, nlags=min(nlags, len(ts) - 1), fft=False)
         test_statistic = max(abs(acf_values[1:]))
-        
-        # Approximate p-value based on significance
-        p_value = 1.0 - (test_statistic / conf_interval) if test_statistic > conf_interval else 1.0
-        p_value = max(0.0, min(1.0, p_value))
+        p_value = min_p_value
         
         if has_seasonality:
             periods_str = ", ".join(map(str, detected_periods))
-            educational_note = f"Seasonality detected (periods: {periods_str}) - consider seasonal differencing"
-            interpretation = f"H0: No seasonality. ACF peak p={p_value:.4f} <= {alpha}. Reject H0."
+            educational_note = f"Seasonality detected (periods: {periods_str}) - consider seasonal differencing (may trigger on trend/variance)"
+            interpretation = f"H0: No seasonality. Ljung-Box p={p_value:.4f} < {alpha}. Reject H0."
         else:
             educational_note = "No seasonal patterns detected"
-            interpretation = f"H0: No seasonality. ACF peak p={p_value:.4f} > {alpha}. Fail to reject H0."
+            interpretation = f"H0: No seasonality. Ljung-Box p={p_value:.4f} >= {alpha}. Fail to reject H0."
         
         return TestResult(
             test_name="ACF/PACF Peak Detection",
@@ -313,10 +309,10 @@ def ocsb_test(
             p_value = 0.15
         
         if is_stationary:
-            educational_note = f"No seasonal unit roots detected (period {period})"
+            educational_note = f"No seasonal unit roots detected (period {period}). OCSB detects random-walk seasonality, not fixed patterns - use STL for deterministic seasonality"
             interpretation = f"H0: Seasonal unit root present. OCSB t-stat={t_stat:.4f} < {critical_value:.4f}. Reject H0."
         else:
-            educational_note = f"Seasonal unit roots detected (period {period}) - consider seasonal differencing"
+            educational_note = f"Seasonal unit roots detected (period {period}) - consider seasonal differencing (may trigger on trend)"
             interpretation = f"H0: Seasonal unit root present. OCSB t-stat={t_stat:.4f} >= {critical_value:.4f}. Fail to reject H0."
         
         return TestResult(
@@ -513,36 +509,40 @@ def spectral_test(
                 period = 1 / freqs[i] if freqs[i] > 0 else np.inf
                 significant_peaks.append((period, power[i]))
         
-        # Check if any significant peaks match expected periods
+        # ONLY flag seasonality if peaks match expected periods with tolerance
         has_seasonality = False
-        for period, _ in significant_peaks:
-            for exp_period in expected_periods:
-                if abs(period - exp_period) / exp_period < 0.15:
-                    has_seasonality = True
-                    break
-            if has_seasonality:
-                break
+        matched_periods = []
         
-        if not has_seasonality and len(significant_peaks) > 0:
-            has_seasonality = True
+        for period, pwr in significant_peaks:
+            for exp_period in expected_periods:
+                # Adaptive tolerance: tighter for short periods
+                tolerance = 0.1 if exp_period < 20 else 0.15
+                if abs(period - exp_period) / exp_period < tolerance:
+                    has_seasonality = True
+                    matched_periods.append((period, exp_period))
+                    break
+        
         is_stationary = not has_seasonality
         
-        # Test statistic: max power
-        test_statistic = np.max(power) if len(power) > 0 else 0
-        
-        # Approximate p-value
-        p_value = 1.0 - (test_statistic / threshold_power) if test_statistic > threshold_power else 1.0
-        p_value = max(0.0, min(1.0, p_value))
+        # Fisher's g-test for statistical rigor
+        if len(power) > 0:
+            g_stat = np.max(power) / np.sum(power)
+            # Approximate p-value for Fisher's g-test
+            n_freqs = len(power)
+            p_value = 1.0 - (1.0 - g_stat) ** n_freqs
+            test_statistic = g_stat
+        else:
+            test_statistic = 0
+            p_value = 1.0
         
         if has_seasonality:
-            # Sort by power (strongest first) and show top 3
-            significant_peaks.sort(key=lambda x: x[1], reverse=True)
-            periods_str = ", ".join([f"{p:.1f}" for p, _ in significant_peaks[:3]])
+            # Show matched periods with their detected values
+            periods_str = ", ".join([f"{p:.1f}≈{int(ep)}" for p, ep in matched_periods[:3]])
             educational_note = f"Periodic components detected (periods: {periods_str}) - consider seasonal differencing"
-            interpretation = f"H0: No periodicity. Spectral peaks detected. Reject H0."
+            interpretation = f"H0: No periodicity. Spectral peaks match expected periods (Fisher's g={test_statistic:.4f}). Reject H0."
         else:
             educational_note = "No significant periodic components detected"
-            interpretation = f"H0: No periodicity. No spectral peaks detected. Fail to reject H0."
+            interpretation = f"H0: No periodicity. No peaks match expected periods (Fisher's g={test_statistic:.4f}). Fail to reject H0."
         
         return TestResult(
             test_name="Spectral Analysis",
@@ -787,7 +787,5 @@ def run_all_seasonal_tests(ts: pd.Series, alpha: float = 0.05) -> list:
     return [
         acf_peak_test(ts, alpha),
         stl_test(ts, alpha),
-        canova_hansen_test(ts, alpha),
-        ocsb_test(ts, alpha),
-        spectral_test(ts, alpha)
+        ocsb_test(ts, alpha)
     ]
