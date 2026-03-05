@@ -1,10 +1,6 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import pandas as pd
 import matplotlib.pyplot as plt
-from src.stationarity_toolkit import StationarityToolkit
+from stationarity_toolkit import StationarityToolkit
 
 def plot_data(ts, title="Time Series Data"):
     """Plot the time series data."""
@@ -23,7 +19,7 @@ df['date'] = pd.to_datetime(df['date'])
 ts = pd.Series(df['value'].values, index=pd.DatetimeIndex(df['date'], freq='W-MON'))
 
 # Plot the data
-# plot_data(ts, "Walmart Sales Data")
+plot_data(ts, "Walmart Sales Data")
 
 # Create toolkit
 toolkit = StationarityToolkit(alpha=0.05)
@@ -31,15 +27,14 @@ toolkit = StationarityToolkit(alpha=0.05)
 # Test minimal verbosity
 print("=== MINIMAL ===")
 result = toolkit.detect(ts, verbosity='minimal')
-print(f"Trend stationary: {result.trend_stationary}")
-print(f"Variance stationary: {result.variance_stationary}")
-print(f"Seasonal stationary: {result.seasonal_stationary}")
+print(result.summary)
 
-# Test detailed verbosity with markdown report
+# Test detailed verbosity with DataFrame report
 print("\n=== DETAILED REPORT ===")
 result = toolkit.detect(ts, verbosity='detailed')
-print(result.report())
+df = result.report()
+print(df)
 
-# Save to file
+# Save markdown to file
 result.report(filepath='examples/stationarity_report.md')
-print("\nReport saved to examples/stationarity_report.md")
+print("\nMarkdown report saved to examples/stationarity_report.md")
