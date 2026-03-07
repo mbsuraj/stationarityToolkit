@@ -2,11 +2,16 @@
 
 import numpy as np
 import pandas as pd
-from statsmodels.tsa.stattools import acf, pacf
+from scipy.linalg import lstsq
+from scipy.signal import periodogram
+from scipy.stats import f as f_dist
+from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.tsa.seasonal import STL
+from statsmodels.tsa.stattools import acf, pacf
 import warnings
 
 from ..results import TestResult
+from ..utils import get_contextual_periods
 
 
 def acf_peak_test(
@@ -30,9 +35,7 @@ def acf_peak_test(
     Returns:
         TestResult object with peak detection results
     """
-    from ..utils import get_contextual_periods
-    from statsmodels.stats.diagnostic import acorr_ljungbox
-    
+   
     ts = timeseries.dropna()
     
     if len(ts) < 20:
@@ -134,8 +137,6 @@ def stl_test(
     Returns:
         TestResult object with STL decomposition results
     """
-    from ..utils import get_contextual_periods
-    
     ts = timeseries.dropna()
     
     if len(ts) < 20:
@@ -171,7 +172,6 @@ def stl_test(
         df2 = len(ts) - 1
         
         # P-value from F-distribution
-        from scipy.stats import f as f_dist
         p_value = 1 - f_dist.cdf(f_stat, df1, df2)
         
         is_stationary = p_value > alpha
@@ -224,8 +224,6 @@ def ocsb_test(
     Returns:
         TestResult object with OCSB test results
     """
-    from ..utils import get_contextual_periods
-    
     ts = timeseries.dropna()
     
     if len(ts) < 20:
@@ -270,7 +268,6 @@ def ocsb_test(
         y_reg = y_diff[max_lags:]
         
         # OLS estimation
-        from scipy.linalg import lstsq
         beta, residuals_sum, _, _ = lstsq(X, y_reg)
         
         # Test statistic: t-statistic on coefficient of y_{t-S}
@@ -355,8 +352,6 @@ def canova_hansen_test(
     Returns:
         TestResult object with Canova-Hansen test results
     """
-    from ..utils import get_contextual_periods
-    
     ts = timeseries.dropna()
     
     if len(ts) < 20:
@@ -389,7 +384,6 @@ def canova_hansen_test(
         X = np.column_stack([np.ones(n), t, dummies])
         
         # OLS estimation
-        from scipy.linalg import lstsq
         beta, _, _, _ = lstsq(X, y)
         
         # Residuals
@@ -477,8 +471,6 @@ def spectral_test(
     Returns:
         TestResult object with spectral analysis results
     """
-    from ..utils import get_contextual_periods
-    
     ts_series = timeseries.dropna()
     expected_periods = get_contextual_periods(ts_series)
     ts = ts_series.values
@@ -490,8 +482,6 @@ def spectral_test(
         )
     
     try:
-        from scipy.signal import periodogram
-        
         # Compute periodogram
         freqs, power = periodogram(ts)
         
@@ -579,8 +569,6 @@ def contextual_period_test(
     Returns:
         TestResult object with contextual period detection results
     """
-    from ..utils import get_contextual_periods
-    
     ts = timeseries.dropna()
     
     if len(ts) < 20:
@@ -600,8 +588,6 @@ def contextual_period_test(
             )
         
         # Test ACF at contextual periods
-        from statsmodels.tsa.stattools import acf
-        
         max_lag = max(periods)
         if max_lag >= len(ts):
             max_lag = len(ts) - 1
@@ -688,8 +674,6 @@ def contextual_rolling_test(
     Returns:
         TestResult object with contextual rolling statistics results
     """
-    from ..utils import get_contextual_periods
-    
     ts = timeseries.dropna()
     
     if len(ts) < 20:
