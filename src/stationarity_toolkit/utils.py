@@ -1,5 +1,3 @@
-"""Helper functions for stationarity toolkit."""
-
 import pandas as pd
 
 

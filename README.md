@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18818474.svg)](https://doi.org/10.5281/zenodo.18818474)
 
-A comprehensive Python library for time series stationarity analysis. Provides 13 statistical tests with clear diagnostics and actionable transformation guidance.
+A comprehensive Python library for time series stationarity analysis. Provides 11 statistical tests with clear diagnostics and actionable transformation guidance.
 
 ## What This Does
 
@@ -51,7 +51,7 @@ result.report(filepath='stationarity_report.md')
 
 ## Statistical Tests
 
-The toolkit runs 13 tests across three categories. Here's what each test does:
+The toolkit runs 11 tests across three categories. Here's what each test does:
 
 **Trend Tests (4 tests)** check for constant mean. ADF (Augmented Dickey-Fuller) tests for unit roots vs deterministic trends using 4-case logic. KPSS (Kwiatkowski-Phillips-Schmidt-Shin) complements ADF with a reverse null hypothesis. Phillips-Perron is a non-parametric unit root test robust to heteroskedasticity. Zivot-Andrews detects structural breaks (discrete regime changes, not smooth trends) and pinpoints their location.
 

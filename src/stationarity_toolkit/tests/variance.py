@@ -3,6 +3,9 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
+from statsmodels.regression.linear_model import OLS
+from statsmodels.stats.diagnostic import het_arch
+from statsmodels.tools import add_constant
 import warnings
 
 from ..results import TestResult
@@ -167,10 +170,6 @@ def white_test(
     Returns:
         TestResult object with test statistics and interpretation
     """
-    from statsmodels.regression.linear_model import OLS
-    from statsmodels.tools import add_constant
-    import warnings
-    
     ts = timeseries.dropna().values
     n = len(ts)
     
@@ -256,9 +255,6 @@ def arch_test(
     Returns:
         TestResult object with test statistics and interpretation
     """
-    from statsmodels.stats.diagnostic import het_arch
-    import warnings
-    
     ts = timeseries.dropna().values
     n = len(ts)
     

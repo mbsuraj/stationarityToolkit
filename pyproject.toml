@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0,<68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "stationaritytoolkit"
-version = "1.0.0"
+version = "2.0.0"
 description = "Comprehensive time series stationarity analysis with rigorous statistical testing across trend, variance, and seasonality"
 readme = "README.md"
 requires-python = ">=3.10"

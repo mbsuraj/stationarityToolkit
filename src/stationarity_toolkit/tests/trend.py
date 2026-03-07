@@ -2,7 +2,8 @@
 
 import numpy as np
 import pandas as pd
-from statsmodels.tsa.stattools import adfuller, kpss
+from arch.unitroot import PhillipsPerron
+from statsmodels.tsa.stattools import adfuller, kpss, zivot_andrews
 import warnings
 
 from ..results import TestResult
@@ -184,7 +185,6 @@ def phillips_perron_test(
     Returns:
         TestResult object with test statistics and interpretation
     """
-    from arch.unitroot import PhillipsPerron
     
     ts = timeseries.dropna().values
     
@@ -262,7 +262,6 @@ def zivot_andrews_test(
     Returns:
         TestResult object with test statistics and interpretation
     """
-    from statsmodels.tsa.stattools import zivot_andrews
     
     ts = timeseries.dropna()
     
