@@ -2,11 +2,11 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18818474.svg)](https://doi.org/10.5281/zenodo.18818474)
 
-A comprehensive Python library for time series stationarity analysis. Provides 11 statistical tests with clear diagnostics and actionable transformation guidance.
+A comprehensive Python library for time series stationarity analysis. Provides 10 statistical tests with clear diagnostics and actionable transformation guidance.
 
 ## What This Does
 
-StationarityToolkit runs comprehensive stationarity checks across three dimensions: trend (unit roots, deterministic trends, structural breaks), variance (heteroskedasticity, volatility clustering), and seasonality (periodic patterns, seasonal unit roots). You get 4 trend tests, 4 variance tests, and 3 seasonal tests—all in one run. Each test returns not just pass/fail, but actionable notes indicating the appropriate transformation: differencing for unit roots, detrending for deterministic trends, Box-Cox for variance instability, seasonal differencing for seasonality, or GARCH modeling for volatility clustering.
+StationarityToolkit runs comprehensive stationarity checks across three dimensions: trend (unit roots, deterministic trends, structural breaks), variance (heteroskedasticity, volatility clustering), and seasonality (periodic patterns). You get 4 trend tests, 4 variance tests, and 2 seasonal tests—all in one run. Each test returns not just pass/fail, but actionable notes indicating the appropriate transformation: differencing for unit roots, detrending for deterministic trends, Box-Cox for variance instability, seasonal differencing for seasonality, or GARCH modeling for volatility clustering.
 
 ## Why Use This
 
@@ -51,13 +51,13 @@ result.report(filepath='stationarity_report.md')
 
 ## Statistical Tests
 
-The toolkit runs 11 tests across three categories. Here's what each test does:
+The toolkit runs 10 tests across three categories. Here's what each test does:
 
 **Trend Tests (4 tests)** check for constant mean. ADF (Augmented Dickey-Fuller) tests for unit roots vs deterministic trends using 4-case logic. KPSS (Kwiatkowski-Phillips-Schmidt-Shin) complements ADF with a reverse null hypothesis. Phillips-Perron is a non-parametric unit root test robust to heteroskedasticity. Zivot-Andrews detects structural breaks (discrete regime changes, not smooth trends) and pinpoints their location.
 
 **Variance Tests (4 tests)** check for constant variance. Levene's Test detects variance changes across segmented series. Bartlett's Test is similar to Levene but assumes normality. White's Test detects time-dependent variance patterns (heteroskedasticity). ARCH Test detects volatility clustering (time-varying conditional variance) - may trigger on trend/seasonality if present.
 
-**Seasonal Tests (3 tests)** check for periodic patterns; contextual lag periods used based on given time-series freq. ACF/PACF Peak Detection identifies seasonality through autocorrelation peaks at contextual periods (may trigger on trend/variance). STL Decomposition tests the significance of seasonal components via variance comparison (detects deterministic seasonality). OCSB is a regression-based seasonal unit root test (detects stochastic seasonality, not fixed patterns - use STL for deterministic).
+**Seasonal Tests (2 tests)** check for periodic patterns; contextual lag periods used based on given time-series freq. ACF/PACF Peak Detection identifies seasonality through autocorrelation peaks at contextual periods (may trigger on trend/variance). STL Decomposition tests the significance of seasonal components via variance comparison (detects deterministic seasonality).
 
 ## Workflow: How to Use the Toolkit
 
@@ -71,23 +71,21 @@ result = toolkit.detect(ts, verbosity='detailed')
 
 Check the summary. If all three categories (trend, variance, seasonality) are stationary, you can proceed with modeling. If any are non-stationary, follow the transformation workflow below.
 
-### Step 2: Address Non-Stationarity (Order Matters!)
+### Step 2: Address Non-Stationarity
 
-When transforming non-stationary data, always address issues in this order: Variance → Trend → Seasonality. This sequence matters because unstable variance affects the reliability of trend and seasonal tests, and unremoved trends can obscure seasonal patterns. See [Why Order Matters](#why-order-matters-variance--trend--seasonality) for the reasoning behind this sequence.
+Transformations interact unpredictably—differencing can introduce variance issues, variance stabilization can be undone by differencing, and the optimal order varies by dataset. A common starting point is Variance → Trend → Seasonality, but this isn't universal. Use the toolkit iteratively: apply a transformation, retest, and let the results guide your next step.
 
-#### 2.1 Stabilize Variance First
+#### 2.1 Stabilize Variance
 
 If Levene's, Bartlett's, or White's tests detect variance instability, consider power transformations like Box-Cox (for positive data) or Yeo-Johnson (handles negative values). If the ARCH test detects volatility clustering, you may need GARCH modeling after addressing trend and seasonality. The toolkit's notes will guide you on which issue was detected.
 
-#### 2.2 Address Trend (After Variance is Stable)
+#### 2.2 Address Trend
 
 If ADF, KPSS, or Phillips-Perron detect a unit root, differencing is typically needed. If they detect a deterministic trend, detrending (removing the fitted trend) is appropriate. If Zivot-Andrews detects structural breaks, consider approaches like dummy variables at break points, splitting the series into segments, or piecewise regression. The 4-case logic in the test notes will tell you which situation applies (see [4-Case Logic for Trend Tests](#4-case-logic-for-trend-tests) for details).
 
-#### 2.3 Address Seasonality (Last)
+#### 2.3 Address Seasonality
 
-If ACF, STL, or OCSB tests detect seasonal patterns, seasonal differencing at the detected period is a common approach. Alternatively, STL decomposition can separate the seasonal component, allowing you to model the residuals. The toolkit reports the detected period (e.g., 52 for yearly seasonality in weekly data). Note: OCSB detects stochastic (random-walk) seasonality, while STL detects deterministic (fixed) patterns.
-
-After each transformation, re-run the toolkit to verify stationarity has been achieved. Sometimes multiple iterations are needed—for example, differencing might introduce new variance patterns requiring stabilization.
+If ACF or STL tests detect seasonal patterns, seasonal differencing at the detected period is a common approach. Alternatively, STL decomposition can separate the seasonal component, allowing you to model the residuals. The toolkit reports the detected period (e.g., 52 for yearly seasonality in weekly data).
 
 ### Step 3: Iterate Until Stationary
 
@@ -122,9 +120,9 @@ Each test returns four key pieces of information: a pass/fail result (✅ Statio
 
 ## Key Concepts
 
-### Why Order Matters: Variance → Trend → Seasonality
+### Transformation Order Considerations
 
-When transforming non-stationary data, the sequence matters. Start with variance stabilization because unstable variance throws off the reliability of trend and seasonal tests—you might miss a unit root or misidentify seasonality if variance is jumping around. Once variance is stable, address trend next. Trend affects the mean level of your series, and if you try to detect seasonality while a strong trend is present, you'll get confused signals. Remove the trend first, then seasonal patterns become clear and easy to identify. Think of it like cleaning a dataset: fix the noise (variance), remove the drift (trend), then handle the cycles (seasonality).
+Transformations interact unpredictably across datasets. Variance → Trend → Seasonality is a common starting point: unstable variance can distort trend and seasonal tests, and strong trends can obscure seasonal patterns. However, this isn't universal—sometimes seasonal differencing before regular differencing works better, or detrending before variance stabilization is more effective. The toolkit's iterative approach lets you test after each transformation and adjust based on what you observe.
 
 ### Comprehensive Testing, Informed Decisions
 
