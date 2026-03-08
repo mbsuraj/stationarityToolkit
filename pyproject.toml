@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
   { name="Bhanu Suraj Malla", email="bsmalla@asu.edu" },
+  { name="Yuqing Hu" },
 ]
 dependencies = [
     "numpy>=1.20.0",
