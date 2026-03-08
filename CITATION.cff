@@ -8,6 +8,7 @@ authors:
     given-names: "Yuqing"
 title: "StationarityToolkit: Comprehensive Time Series Stationarity Analysis"
 version: 2.0.2
+doi: 10.5281/zenodo.18818474
 date-released: 2024-12-01
 url: "https://github.com/mbsuraj/stationarityToolkit"
 repository-code: "https://github.com/mbsuraj/stationarityToolkit"
