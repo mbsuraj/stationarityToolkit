@@ -5,7 +5,7 @@ authors:
     given-names: "Bhanu Suraj"
     email: "bsmalla@asu.edu"
 title: "StationarityToolkit: Comprehensive Time Series Stationarity Analysis"
-version: 1.0.0
+version: 2.0.2
 date-released: 2024-12-01
 url: "https://github.com/mbsuraj/stationarityToolkit"
 repository-code: "https://github.com/mbsuraj/stationarityToolkit"
