@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from statsmodels.regression.linear_model import OLS
-from statsmodels.stats.diagnostic import het_arch
+from statsmodels.stats.diagnostic import het_arch, het_white
 from statsmodels.tools import add_constant
 import warnings
 
@@ -186,35 +186,24 @@ def white_test(
         # Fit simple linear model
         X = add_constant(t)
         model = OLS(ts, X).fit()
-        residuals = model.resid
         
-        # Regress squared residuals on predictors and their squares
-        resid_sq = residuals ** 2
-        X_white = np.column_stack([t, t**2])
-        X_white = add_constant(X_white)
+        # Perform White's test
+        # ref. https://towardsdatascience.com/how-to-detect-heteroskedasticity-in-time-series-3413a8aa8da9/
+        lm_statistic, lm_pvalue, f_statistic, f_pvalue = het_white(model.resid, model.model.exog)
         
-        white_model = OLS(resid_sq, X_white).fit()
-        
-        # Test statistic: n * R^2
-        statistic = n * white_model.rsquared
-        
-        # Chi-square test with degrees of freedom = number of regressors (excluding constant)
-        df = X_white.shape[1] - 1
-        p_value = 1 - stats.chi2.cdf(statistic, df)
-        
-        is_stationary = p_value > alpha
+        is_stationary = lm_pvalue > alpha
         
         if is_stationary:
             educational_note = "Constant variance across time"
-            interpretation = f"H0: Homoskedasticity. White p={p_value:.4f} > {alpha}. Fail to reject H0."
+            interpretation = f"H0: Homoskedasticity. White p={lm_pvalue:.4f} > {alpha}. Fail to reject H0."
         else:
             educational_note = "Time-dependent variance detected - consider Box-Cox or Yeo-Johnson transform"
-            interpretation = f"H0: Homoskedasticity. White p={p_value:.4f} <= {alpha}. Reject H0."
+            interpretation = f"H0: Homoskedasticity. White p={lm_pvalue:.4f} <= {alpha}. Reject H0."
         
         return TestResult(
             test_name="White's Test for Heteroskedasticity",
-            statistic=statistic,
-            p_value=p_value,
+            statistic=lm_statistic,
+            p_value=lm_pvalue,
             is_stationary=is_stationary,
             interpretation=interpretation,
             educational_note=educational_note
@@ -299,9 +288,6 @@ def arch_test(
             interpretation=f"Test failed: {str(e)}",
             educational_note=""
         )
-
-
-
 
 def run_all_variance_tests(
     timeseries: pd.Series,

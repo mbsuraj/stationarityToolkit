@@ -12,3 +12,4 @@ temp_unpack
 venv1
 .kiro
 build
+*.pdf
