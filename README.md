@@ -7,7 +7,7 @@ Python library for time series stationarity analysis. Runs 10 statistical tests 
 ## Installation
 
 ```bash
-pip install stationarity-toolkit
+pip install stationaritytoolkit
 ```
 
 ## Quick Start
