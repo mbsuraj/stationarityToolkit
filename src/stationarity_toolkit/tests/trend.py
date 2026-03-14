@@ -60,7 +60,7 @@ def adf_test(
             interpretation = f"H0: Unit root. ADF-c p={result_c[1]:.4f} >= {alpha}, ADF-ct p={result_ct[1]:.4f} < {alpha}. Deterministic trend."
         else:
             is_stationary = False
-            educational_note = "Unit root detected - requires differencing"
+            educational_note = "Unit root detected - consider differencing"
             interpretation = f"H0: Unit root. ADF-c p={result_c[1]:.4f} >= {alpha}, ADF-ct p={result_ct[1]:.4f} >= {alpha}. Fail to reject H0."
         
         return TestResult(
@@ -137,7 +137,7 @@ def kpss_test(
             interpretation = f"H0: Stationary. KPSS-c p={result_c[1]:.4f} <= {alpha}, KPSS-ct p={result_ct[1]:.4f} > {alpha}. Deterministic trend."
         else:
             is_stationary = False
-            educational_note = "Unit root detected - requires differencing"
+            educational_note = "Unit root detected - consider differencing"
             interpretation = f"H0: Stationary. KPSS-c p={result_c[1]:.4f} <= {alpha}, KPSS-ct p={result_ct[1]:.4f} <= {alpha}. Reject H0."
         
         return TestResult(
@@ -215,7 +215,7 @@ def phillips_perron_test(
             interpretation = f"H0: Unit root. PP-c p={pp_c.pvalue:.4f} >= {alpha}, PP-ct p={pp_ct.pvalue:.4f} < {alpha}. Deterministic trend."
         else:
             is_stationary = False
-            educational_note = "Unit root detected - requires differencing"
+            educational_note = "Unit root detected - consider differencing"
             interpretation = f"H0: Unit root. PP-c p={pp_c.pvalue:.4f} >= {alpha}, PP-ct p={pp_ct.pvalue:.4f} >= {alpha}. Fail to reject H0."
         
         return TestResult(
