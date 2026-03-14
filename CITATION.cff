@@ -7,7 +7,7 @@ authors:
   - family-names: "Hu"
     given-names: "Yuqing"
 title: "StationarityToolkit: Comprehensive Time Series Stationarity Analysis"
-version: 2.0.2
+version: 2.0.3
 doi: 10.5281/zenodo.18818474
 date-released: 2025-03-08
 url: "https://github.com/mbsuraj/stationarityToolkit"
