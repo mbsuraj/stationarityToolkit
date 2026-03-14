@@ -32,7 +32,7 @@ Stationarity testing is one of the critical preprocessing steps for time series 
 
 This gap becomes particularly challenging when transformations interact unpredictably. Differencing to remove trend can introduce variance non-stationarity; variance stabilization can be undone by subsequent differencing. Without comprehensive testing after each transformation, practitioners cannot verify whether their preprocessing actually achieved stationarity or introduced new problems. An iterative test-transform-retest workflow is essential, but orchestrating this across multiple libraries and tests is tedious and error-prone. 
 
-The target audience includes data scientists, econometricians, and researchers working with time series data who need to prepare data for different use cases including ARIMA/SARIMA models, VAR analysis, Granger causality tests, or machine learning applications where stationarity improves generalization. The toolkit is particularly valuable for practitioners who need to understand *what type* of non-stationarity exists in their data.
+Potential users include data scientists, econometricians, and researchers working with time series data who need to prepare data for different use cases including ARIMA/SARIMA models, VAR analysis, Granger causality tests, or machine learning applications where stationarity improves generalization. The toolkit is particularly valuable for practitioners who need to understand *what type* of non-stationarity exists in their data.
 
 # State of the Field
 
@@ -50,9 +50,9 @@ The toolkit evolved significantly from its initial design. Early versions (0.x) 
 
 Key design decisions include:
 
-1. **Comprehensive testing by default**: Running all 10 tests in a single call eliminates the cognitive burden of deciding which tests to run and at the same time ensures users don't miss critical information that they would otherwise miss.
+1. **Comprehensive testing by default**: All of the 10 statistical tests are run in a single call eliminating the cognitive burden on deciding which tests to run. This also ensures that the users don't miss critical information that they would otherwise miss.
 
-2. **Structured output with actionable notes**: Each test returns not just pass/fail but also concise notes on the test, its caveats and suggestions (e.g. "Unit root detected - requires differencing", "Deterministic trend detected - stationary after detrending").
+2. **Structured output with actionable notes**: Each test returns not just pass/fail but also concise notes on the test, its caveats and suggestions (e.g. "Unit root detected - consider differencing", "Deterministic trend detected - stationary after detrending").
 
 3. **Contextual seasonality detection**: Seasonal tests automatically determine appropriate periods to test based on time series frequency (e.g. testing for weekly, monthly, and yearly seasonality in daily data), eliminating the need for manually specifying periods to test. This requires the time series to have datetime index.
 
@@ -68,7 +68,7 @@ The implementation prioritizes correctness and interpretability. Tests run seque
 
 # Research Impact Statement
 
-`StationarityToolkit` addresses a genuine gap in the Python ecosystem; while individual stationarity tests exist in various libraries, no tool provides comprehensive integrated testing across trend, variance, and seasonality dimensions with actionable notes. The package has been publicly available on PyPI since 2023.
+`StationarityToolkit` addresses a genuine gap in the Python ecosystem; while individual stationarity tests exist in various libraries, no tool provides comprehensive integrated testing across trend, variance, and seasonality dimensions with actionable notes and caveats. The package has been publicly available on PyPI since 2023; downloaded over 8,200 times since then, with sustained usage (1,200 downloads in the past month as of March 2026)
 
 The toolkit's research significance lies in its ability to reveal test limitations and cross-contamination effects (e.g. variance non-stationarity emerging as a result of differencing to allay trend non-stationarity) that single-test approaches miss. The comprehensive documentation, including validation on synthetic as well as real data (`examples/detailed_usage.ipynb`), provides researchers with a context for when and why different tests succeed or fail. This transparency is particularly valuable when reproducibility is important - where understanding *why* a transformation was chosen matters as much as the transformation itself.
 
