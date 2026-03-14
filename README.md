@@ -4,6 +4,8 @@
 
 Python library for time series stationarity analysis. Runs 10 statistical tests across trend, variance, and seasonality dimensions.
 
+![demo](examples/detailed_usage_files/recording3.gif)
+
 ## Installation
 
 ```bash

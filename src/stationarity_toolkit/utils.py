@@ -17,16 +17,15 @@ def get_contextual_periods(ts: pd.Series) -> list[int]:
     
     if freq:
         freq_str = str(freq)
-        # Check for weekly frequency (can be 'W', 'W-MON', '<Week: weekday=0>', etc.)
         if 'W' in freq_str or 'Week' in freq_str:
             return [52]
-        elif freq_str.startswith('D') or freq_str.startswith('B'):
+        elif 'Day' in freq_str or freq_str.startswith('D') or 'Business' in freq_str or freq_str.startswith('B'):
             return [7, 30, 365]
-        elif freq_str.startswith('H'):
+        elif 'Hour' in freq_str or freq_str.startswith('H') or freq_str.startswith('h'):
             return [24, 168]
-        elif freq_str.startswith('M') and 'Month' not in freq_str:
-            return [3, 6, 12]
-        elif freq_str.startswith('Q'):
+        elif 'Quarter' in freq_str or freq_str.startswith('Q'):
             return [4]
+        elif 'Month' in freq_str or freq_str.startswith('M'):
+            return [3, 6, 12]
     
     return [7, 12, 30, 52, 365]
