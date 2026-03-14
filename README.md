@@ -1,6 +1,10 @@
 # StationarityToolkit
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18818474.svg)](https://doi.org/10.5281/zenodo.18818474)
+[![CI](https://github.com/mbsuraj/stationarityToolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/mbsuraj/stationarityToolkit/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/stationaritytoolkit)](https://pypi.org/project/stationaritytoolkit/)
+[![Python](https://img.shields.io/pypi/pyversions/stationaritytoolkit)](https://pypi.org/project/stationaritytoolkit/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Python library for time series stationarity analysis. Runs 10 statistical tests across trend, variance, and seasonality dimensions.
 
