@@ -17,7 +17,7 @@ Usage:
     result.report(filepath='report.md')
 """
 
-from .toolkit import StationarityToolkit
-from .results import DetectionResult, TestResult
+from stationarity_toolkit.toolkit import StationarityToolkit
+from stationarity_toolkit.results import DetectionResult, TestResult
 
 __all__ = ['StationarityToolkit', 'DetectionResult', 'TestResult']

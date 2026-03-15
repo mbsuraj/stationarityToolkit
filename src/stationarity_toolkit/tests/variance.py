@@ -8,7 +8,7 @@ from statsmodels.stats.diagnostic import het_arch, het_white
 from statsmodels.tools import add_constant
 import warnings
 
-from ..results import TestResult
+from stationarity_toolkit.results import TestResult
 
 
 def levene_test(
