@@ -4,8 +4,10 @@ authors:
   - family-names: "Malla"
     given-names: "Bhanu Suraj"
     email: "bsmalla@asu.edu"
+    orcid: "https://orcid.org/0009-0000-3593-2455"
   - family-names: "Hu"
     given-names: "Yuqing"
+    orcid: "https://orcid.org/0009-0008-3071-473X"
 title: "StationarityToolkit: Comprehensive Time Series Stationarity Analysis"
 version: 2.0.3
 doi: 10.5281/zenodo.18818474

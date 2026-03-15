@@ -10,11 +10,14 @@ tags:
     - Machine Learning
 authors:
     - name: Bhanu Suraj Malla
-      affiliations: 1
+      orcid: 0009-0000-3593-2455
+      corresponding: true
+      affiliation: 1
     - name: Yuqing Hu
-      affiliations: 1
+      orcid: 0009-0008-3071-473X
+      affiliation: 1
 affiliations:
-    - name: Independent Researcher
+    - name: Independent Researcher, United States
       index: 1
 date: 5 March 2026
 bibliography: paper.bib
@@ -42,7 +45,7 @@ Several Python packages address aspects of time series stationarity testing. The
 
 The design philosophy of the toolkit prioritizes transparency over prescription; the toolkit shows users what's happening in their data rather than making transformation decisions for them. This is because transformation effectiveness could vary unpredictably across datasets, and across use cases as demonstrated in the package documentation where identical transformations produce opposite variance outcomes on synthetic versus real data.
 
-# Software Design
+# Software design
 
 `StationarityToolkit` is implemented as a pure Python package with dependencies on `numpy` [@2020NumPy-Array], `pandas` [@mckinney2010pandas], `scipy` [@2020SciPy-NMeth], `arch` [@sheppard2017arch], and `statsmodels` [@seabold2010statsmodels]. The architecture separates test implementation (in `tests/` modules organized by trend, variance, and seasonality), result formatting and output generation (`results.py`), and the main detection entry point (`toolkit.py`). This design enables community contributions, reliably expanding the suite of tests while maintaining consistent user experience.
 
