@@ -6,7 +6,7 @@ from arch.unitroot import PhillipsPerron
 from statsmodels.tsa.stattools import adfuller, kpss, zivot_andrews
 import warnings
 
-from ..results import TestResult
+from stationarity_toolkit.results import TestResult
 
 
 def adf_test(

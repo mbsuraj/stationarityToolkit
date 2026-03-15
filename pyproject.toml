@@ -35,3 +35,6 @@ dev = [
 [project.urls]
 "Homepage" = "https://github.com/mbsuraj/stationarityToolkit"
 "Bug Tracker" = "https://github.com/mbsuraj/stationarityToolkit/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]

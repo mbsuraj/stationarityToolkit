@@ -10,8 +10,8 @@ from statsmodels.tsa.seasonal import STL
 from statsmodels.tsa.stattools import acf, pacf
 import warnings
 
-from ..results import TestResult
-from ..utils import get_contextual_periods
+from stationarity_toolkit.results import TestResult
+from stationarity_toolkit.utils import get_contextual_periods
 
 
 def acf_peak_test(

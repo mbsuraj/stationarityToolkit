@@ -1,8 +1,8 @@
 import pandas as pd
-from .results import DetectionResult
-from .tests.trend import run_all_trend_tests
-from .tests.variance import run_all_variance_tests
-from .tests.seasonal import run_all_seasonal_tests
+from stationarity_toolkit.results import DetectionResult
+from stationarity_toolkit.tests.trend import run_all_trend_tests
+from stationarity_toolkit.tests.variance import run_all_variance_tests
+from stationarity_toolkit.tests.seasonal import run_all_seasonal_tests
 
 
 class StationarityToolkit:
