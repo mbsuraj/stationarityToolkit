@@ -177,7 +177,7 @@ If you use this toolkit in your research, please cite:
 @software{stationarity_toolkit,
   title={StationarityToolkit: Comprehensive Time Series Stationarity Analysis},
   author={Malla, Bhanu Suraj and Hu, Yuqing},
-  year={2025},
+  year={2026},
   url={https://github.com/mbsuraj/stationarityToolkit},
   doi={10.5281/zenodo.18818474}
 }

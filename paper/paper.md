@@ -68,7 +68,7 @@ The implementation prioritizes correctness and interpretability. Tests run seque
 
 # Research Impact Statement
 
-`StationarityToolkit` addresses a genuine gap in the Python ecosystem; while individual stationarity tests exist in various libraries, no tool provides comprehensive integrated testing across trend, variance, and seasonality dimensions with actionable notes and caveats. The package has been publicly available on PyPI since 2023; downloaded over 8,200 times since then, with sustained usage (1,200 downloads in the past month as of March 2026)
+`StationarityToolkit` addresses a genuine gap in the Python ecosystem; while individual stationarity tests exist in various libraries, no tool provides comprehensive integrated testing across trend, variance, and seasonality dimensions with actionable notes and caveats. The package has been publicly available on PyPI since 2023.
 
 The toolkit's research significance lies in its ability to reveal test limitations and cross-contamination effects (e.g. variance non-stationarity emerging as a result of differencing to allay trend non-stationarity) that single-test approaches miss. The comprehensive documentation, including validation on synthetic as well as real data (`examples/detailed_usage.ipynb`), provides researchers with a context for when and why different tests succeed or fail. This transparency is particularly valuable when reproducibility is important - where understanding *why* a transformation was chosen matters as much as the transformation itself.
 
