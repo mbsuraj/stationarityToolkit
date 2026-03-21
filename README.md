@@ -1,6 +1,6 @@
 # StationarityToolkit
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18818474.svg)](https://doi.org/10.5281/zenodo.18818474)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19026783.svg)](https://doi.org/10.5281/zenodo.19026783)
 [![CI](https://github.com/mbsuraj/stationarityToolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/mbsuraj/stationarityToolkit/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/stationaritytoolkit)](https://pypi.org/project/stationaritytoolkit/)
 [![Python](https://img.shields.io/pypi/pyversions/stationaritytoolkit)](https://pypi.org/project/stationaritytoolkit/)
