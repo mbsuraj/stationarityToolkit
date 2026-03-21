@@ -95,6 +95,8 @@ This toolkit runs every relevant test and reports all results—not just a singl
 
 ### 4-Case Logic for Trend Tests
 
+<img src="examples/detailed_usage_files/4case_logic.png" alt="4-Case Logic" width="700">
+
 When testing for trend non-stationarity, unit root tests (ADF, KPSS, Phillips-Perron) face a challenge: they need to distinguish between unit roots (random walk behavior requiring differencing) and deterministic trends (predictable drift requiring detrending). The toolkit runs each test twice—once with just a constant ('c') and once with constant plus trend ('ct'). If both pass, you're stationary. If only 'c' passes, you're stationary around a constant. If only 'ct' passes, you have a deterministic trend. If both fail, you have a unit root. 
 
 The toolkit's report notes automatically identify which case applies and tell you the exact transformation needed:
@@ -110,8 +112,6 @@ The toolkit's report notes automatically identify which case applies and tell yo
 - Note: Deterministic trend detected - stationary after detrending
 - Interpretation: H0: Unit root. ADF-c p=0.1234 >= 0.05, ADF-ct p=0.0123 < 0.05. Deterministic trend.
 ```
-
-No guesswork, just clear guidance based on the 4-case analysis.
 
 ## API Reference
 
