@@ -17,7 +17,7 @@ authors:
       orcid: 0009-0008-3071-473X
       affiliation: 1
 affiliations:
-    - name: Independent Researcher, United States
+    - name: Georgia Institute of Technology, United States
       index: 1
 date: 5 March 2026
 bibliography: paper.bib
