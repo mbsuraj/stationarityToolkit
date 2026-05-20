@@ -14,7 +14,7 @@ def plot_data(ts, title="Time Series Data"):
     plt.show()
 
 # Load Walmart sales data
-df = pd.read_csv('examples/walmartSales_FOODS_3_586_TX_1_evaluation.csv')
+df = pd.read_csv('examples/data/walmartSales_FOODS_3_586_TX_1_evaluation.csv')
 df['date'] = pd.to_datetime(df['date'])
 ts = pd.Series(df['value'].values, index=pd.DatetimeIndex(df['date'], freq='W-MON'))
 
@@ -36,5 +36,5 @@ df = result.report()
 print(df)
 
 # Save markdown to file
-result.report(filepath='examples/stationarity_report.md')
-print("\nMarkdown report saved to examples/stationarity_report.md")
+result.report(filepath='examples/reports/stationarity_report.md')
+print("\nMarkdown report saved to examples/reports/stationarity_report.md")

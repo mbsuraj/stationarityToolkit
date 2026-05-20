@@ -68,7 +68,7 @@ plot_ts(ts_noise.values, "Pure Noise (Stationary)")
 
 result = toolkit.detect(ts_noise, verbosity='detailed')
 print(result.summary)
-result.report(filepath='examples/case1_noise_report.md')
+result.report(filepath='examples/reports/case1_noise_report.md')
 ```
 
 
@@ -233,7 +233,7 @@ plot_ts(ts_baseline.values, "Noise + Baseline (Stationary)")
 
 result = toolkit.detect(ts_baseline, verbosity='detailed')
 print(result.summary)
-result.report(filepath='examples/case2_baseline_report.md')
+result.report(filepath='examples/reports/case2_baseline_report.md')
 ```
 
 
@@ -398,7 +398,7 @@ plot_ts(ts_trend.values, "Noise + Baseline + Trend (Non-Stationary)")
 
 result = toolkit.detect(ts_trend, verbosity='detailed')
 print(result.summary)
-result.report(filepath='examples/case3_trend_report.md')
+result.report(filepath='examples/reports/case3_trend_report.md')
 ```
 
 
@@ -563,7 +563,7 @@ plot_ts(ts_seasonal.values, "Noise + Baseline + Seasonality (Non-Stationary)")
 
 result = toolkit.detect(ts_seasonal, verbosity='detailed')
 print(result.summary)
-result.report(filepath='examples/case4_seasonal_report.md')
+result.report(filepath='examples/reports/case4_seasonal_report.md')
 ```
 
 
@@ -729,7 +729,7 @@ plot_ts(ts_hetero.values, "Noise + Baseline + Changing Variance (Non-Stationary)
 
 result = toolkit.detect(ts_hetero, verbosity='detailed')
 print(result.summary)
-result.report(filepath='examples/case5_variance_report.md')
+result.report(filepath='examples/reports/case5_variance_report.md')
 ```
 
 
@@ -899,7 +899,7 @@ plot_ts(ts_clustered.values, "Noise + Baseline + Clustered Variance (Non-Station
 
 result = toolkit.detect(ts_clustered, verbosity='detailed')
 print(result.summary)
-result.report(filepath='examples/case6_clustered_report.md')
+result.report(filepath='examples/reports/case6_clustered_report.md')
 ```
 
 
@@ -2203,7 +2203,7 @@ This is why you can't just follow a recipe. You can't assume "Box-Cox then diffe
 
 ```python
 # Load data
-df = pd.read_csv('examples/walmartSales_FOODS_3_586_TX_1_evaluation.csv')
+df = pd.read_csv('examples/data/walmartSales_FOODS_3_586_TX_1_evaluation.csv')
 df['date'] = pd.to_datetime(df['date'])
 ts_walmart = pd.Series(df['value'].values, index=pd.DatetimeIndex(df['date'], freq='W-MON'))
 plot_ts(ts_walmart.values, "Walmart Sales Data")
@@ -2220,7 +2220,7 @@ plot_ts(ts_walmart.values, "Walmart Sales Data")
 # Test
 result_walmart = toolkit.detect(ts_walmart, verbosity='detailed')
 print(result_walmart.summary)
-result_walmart.report(filepath='examples/walmart_report.md')
+result_walmart.report(filepath='examples/reports/walmart_report.md')
 ```
 
     Trend Stationary: ❌ No
