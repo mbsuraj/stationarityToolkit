@@ -39,7 +39,22 @@ Potential users include data scientists, econometricians, and researchers workin
 
 # State of the Field
 
-Several Python packages address aspects of time series stationarity testing. The `statsmodels` library [@seabold2010statsmodels] provides individual unit root tests (ADF [@dickey1979unit], KPSS [@kwiatkowski1992kpss], Phillips-Perron [@phillips1988testing], Zivot-Andrews [@zivot1992further]) and seasonal decomposition (STL [@cleveland1990stl]). The `arch` package [@sheppard2017arch] offers unit root tests and ARCH/GARCH models [@engle1982arch] for volatility modeling, though its primary focus is on fitting volatility models rather than comprehensive stationarity diagnostics. The `scipy` library [@2020SciPy-NMeth] offers variance comparison tests (Levene [@levene1960robust], Bartlett [@bartlett1937properties]). The `pmdarima` library [@smith2017pmdarima] includes stationarity tests primarily as preprocessing for auto-ARIMA model selection rather than as standalone diagnostic tools. In all cases, users must manually run tests from different libraries, interpret potentially conflicting results, and determine which transformations to apply.
+Several Python packages address aspects of time series stationarity testing. The `statsmodels` library [@seabold2010statsmodels] provides individual unit root tests (ADF [@dickey1979unit], KPSS [@kwiatkowski1992kpss], Zivot-Andrews [@zivot1992further]), seasonal decomposition (STL [@cleveland1990stl]), and heteroscedasticity diagnostics (White's test, ARCH test). The `arch` package [@sheppard2017arch] offers unit root tests (ADF, KPSS, Phillips-Perron [@phillips1988testing], Zivot-Andrews) and ARCH/GARCH models [@engle1982arch] for volatility modeling, though its primary focus is on fitting volatility models rather than comprehensive stationarity diagnostics. The `scipy` library [@2020SciPy-NMeth] offers variance comparison tests (Levene [@levene1960robust], Bartlett [@bartlett1937properties]). The `pmdarima` library [@smith2017pmdarima] includes stationarity tests (ADF, KPSS, Phillips-Perron) primarily as preprocessing for auto-ARIMA model selection rather than as standalone diagnostic tools. In all cases, users must manually run tests from different libraries, interpret potentially conflicting results, and determine which transformations to apply.
+
+Table 1 summarizes the coverage of each library across stationarity dimensions.
+
+| Feature | statsmodels | arch | scipy | pmdarima | **StationarityToolkit** |
+|---------|:-----------:|:----:|:-----:|:--------:|:-----------------------:|
+| Unit root tests (ADF, KPSS, PP) | partial | ✓ | — | ✓ | ✓ |
+| Structural break (Zivot-Andrews) | ✓ | ✓ | — | — | ✓ |
+| Variance tests (Levene, Bartlett) | — | — | ✓ | — | ✓ |
+| White's test / ARCH test | ✓ | — | — | — | ✓ |
+| Seasonal decomposition (STL) | ✓ | — | — | — | ✓ |
+| Seasonal stationarity testing | — | — | — | — | ✓ |
+| Automatic frequency inference | — | — | — | — | ✓ |
+| Contextual period selection | — | — | — | — | ✓ |
+
+Note: `statsmodels` has ADF and KPSS but not Phillips-Perron (available in `arch`). It provides White's test (`het_white`) and ARCH test (`het_arch`) as regression diagnostics, and STL for decomposition — but none are integrated into a stationarity testing workflow. `scipy` provides Levene and Bartlett as generic variance comparison functions without time-series segmentation.
 
 `StationarityToolkit` differs by integrating testing across all the stationarity dimensions - trend, variance, and seasonality - in a single call with a report that summarizes test outcome, actionable notes, caveats, and their statistical interpretation. It goes one step further to infer time-series frequency (requires datetime index) before testing for seasonal non-stationarity to maintain intuitiveness in its results. This approach also reveals test limitations in its notes (e.g., Zivot-Andrews detecting "breaks" in smooth trends, ARCH triggering on auto-correlation) that single-test approaches miss.
 
