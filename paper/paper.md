@@ -45,13 +45,13 @@ Table 1 summarizes the coverage of each library across stationarity dimensions.
 
 | | **statsmodels** | **arch** | **scipy** | **pmdarima** | **StationarityToolkit** |
 |---|---|---|---|---|---|
-| Unit root tests (ADF, KPSS, PP) | partial | $\checkmark$ | $\times$ | $\checkmark$ | $\checkmark$ |
-| Structural break (Zivot-Andrews) | $\checkmark$ | $\checkmark$ | $\times$ | $\times$ | $\checkmark$ |
-| Variance tests (Levene, Bartlett) | $\times$ | $\times$ | $\checkmark$ | $\times$ | $\checkmark$ |
-| White's test / ARCH test | $\checkmark$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
-| Seasonal decomposition (STL) | $\checkmark$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
-| Seasonal stationarity testing | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
-| Automatic frequency inference | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Unit root (ADF, KPSS, PP) | partial | $\checkmark$ | $\times$ | $\checkmark$ | $\checkmark$ |
+| Structural break (ZA) | $\checkmark$ | $\checkmark$ | $\times$ | $\times$ | $\checkmark$ |
+| Variance (Levene, Bartlett) | $\times$ | $\times$ | $\checkmark$ | $\times$ | $\checkmark$ |
+| White / ARCH test | $\checkmark$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Seasonal decomposition | $\checkmark$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Seasonal stationarity test | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Auto frequency inference | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
 | Contextual period selection | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
 
 Note: `statsmodels` has ADF and KPSS but not Phillips-Perron (available in `arch`). It provides White's test (`het_white`) and ARCH test (`het_arch`) as regression diagnostics, and STL for decomposition — but none are integrated into a stationarity testing workflow. `scipy` provides Levene and Bartlett as generic variance comparison functions without time-series segmentation.
