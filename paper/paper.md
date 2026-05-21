@@ -43,16 +43,16 @@ Several Python packages address aspects of time series stationarity testing. The
 
 Table 1 summarizes the coverage of each library across stationarity dimensions.
 
-| Feature | statsmodels | arch | scipy | pmdarima | **StationarityToolkit** |
-|---------|:-----------:|:----:|:-----:|:--------:|:-----------------------:|
-| Unit root tests (ADF, KPSS, PP) | partial | ✓ | — | ✓ | ✓ |
-| Structural break (Zivot-Andrews) | ✓ | ✓ | — | — | ✓ |
-| Variance tests (Levene, Bartlett) | — | — | ✓ | — | ✓ |
-| White's test / ARCH test | ✓ | — | — | — | ✓ |
-| Seasonal decomposition (STL) | ✓ | — | — | — | ✓ |
-| Seasonal stationarity testing | — | — | — | — | ✓ |
-| Automatic frequency inference | — | — | — | — | ✓ |
-| Contextual period selection | — | — | — | — | ✓ |
+| | **statsmodels** | **arch** | **scipy** | **pmdarima** | **StationarityToolkit** |
+|---|---|---|---|---|---|
+| Unit root tests (ADF, KPSS, PP) | partial | $\checkmark$ | $\times$ | $\checkmark$ | $\checkmark$ |
+| Structural break (Zivot-Andrews) | $\checkmark$ | $\checkmark$ | $\times$ | $\times$ | $\checkmark$ |
+| Variance tests (Levene, Bartlett) | $\times$ | $\times$ | $\checkmark$ | $\times$ | $\checkmark$ |
+| White's test / ARCH test | $\checkmark$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Seasonal decomposition (STL) | $\checkmark$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Seasonal stationarity testing | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Automatic frequency inference | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
+| Contextual period selection | $\times$ | $\times$ | $\times$ | $\times$ | $\checkmark$ |
 
 Note: `statsmodels` has ADF and KPSS but not Phillips-Perron (available in `arch`). It provides White's test (`het_white`) and ARCH test (`het_arch`) as regression diagnostics, and STL for decomposition — but none are integrated into a stationarity testing workflow. `scipy` provides Levene and Bartlett as generic variance comparison functions without time-series segmentation.
 
